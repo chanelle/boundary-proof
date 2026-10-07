@@ -1,0 +1,223 @@
+{
+  "agent_name": "ci-agent-08",
+  "methodology_version": "boundaryproof-v0.1",
+  "matrix": [
+    {
+      "verb": "read",
+      "intended": "YES",
+      "configured": "YES",
+      "observed": "UNKNOWN",
+      "configured_provenance": "service-account-iam.json",
+      "observed_provenance": ""
+    },
+    {
+      "verb": "write",
+      "intended": "YES",
+      "configured": "YES",
+      "observed": "UNKNOWN",
+      "configured_provenance": "service-account-iam.json",
+      "observed_provenance": ""
+    },
+    {
+      "verb": "execute",
+      "intended": "YES",
+      "configured": "YES",
+      "observed": "UNKNOWN",
+      "configured_provenance": "service-account-iam.json",
+      "observed_provenance": ""
+    },
+    {
+      "verb": "commit",
+      "intended": "YES",
+      "configured": "YES",
+      "observed": "UNKNOWN",
+      "configured_provenance": "service-account-iam.json",
+      "observed_provenance": ""
+    },
+    {
+      "verb": "delete",
+      "intended": "NO",
+      "configured": "NO",
+      "observed": "UNKNOWN",
+      "configured_provenance": "service-account-iam.json",
+      "observed_provenance": ""
+    },
+    {
+      "verb": "deploy",
+      "intended": "NO",
+      "configured": "YES",
+      "observed": "UNKNOWN",
+      "configured_provenance": "service-account-iam.json",
+      "observed_provenance": ""
+    },
+    {
+      "verb": "send_external",
+      "intended": "NO",
+      "configured": "NO",
+      "observed": "UNKNOWN",
+      "configured_provenance": "service-account-iam.json",
+      "observed_provenance": ""
+    },
+    {
+      "verb": "transact",
+      "intended": "NO",
+      "configured": "NO",
+      "observed": "UNKNOWN",
+      "configured_provenance": "service-account-iam.json",
+      "observed_provenance": ""
+    },
+    {
+      "verb": "approve",
+      "intended": "NO",
+      "configured": "NO",
+      "observed": "UNKNOWN",
+      "configured_provenance": "service-account-iam.json",
+      "observed_provenance": ""
+    },
+    {
+      "verb": "delegate",
+      "intended": "NO",
+      "configured": "NO",
+      "observed": "UNKNOWN",
+      "configured_provenance": "service-account-iam.json",
+      "observed_provenance": ""
+    },
+    {
+      "verb": "escalate",
+      "intended": "NO",
+      "configured": "NO",
+      "observed": "UNKNOWN",
+      "configured_provenance": "service-account-iam.json",
+      "observed_provenance": ""
+    }
+  ],
+  "mismatches": [
+    {
+      "id": "M-01",
+      "verb": "deploy",
+      "mismatch_class": "CONFIGURED_EXCEEDS_INTENDED",
+      "intended": "NO",
+      "configured": "YES",
+      "observed": "UNKNOWN",
+      "detail": "Configured permission (YES) exceeds delegated intent (NO); actual behavior is UNKNOWN. Over-broad configuration with no compensating control.",
+      "evidence_ids": []
+    }
+  ],
+  "findings": [
+    {
+      "id": "F-01",
+      "title": "Configured Exceeds Intended \u2014 'deploy'",
+      "severity": "High",
+      "confidence": "High",
+      "likelihood": "Plausible",
+      "blast_radius": "Significant",
+      "mismatch": {
+        "id": "M-01",
+        "verb": "deploy",
+        "mismatch_class": "CONFIGURED_EXCEEDS_INTENDED",
+        "intended": "NO",
+        "configured": "YES",
+        "observed": "UNKNOWN",
+        "detail": "Configured permission (YES) exceeds delegated intent (NO); actual behavior is UNKNOWN. Over-broad configuration with no compensating control.",
+        "evidence_ids": []
+      },
+      "attack_path_ids": [],
+      "evidence_ids": [
+        "EV-01"
+      ],
+      "unknown_ids": [],
+      "remediation": {
+        "recommendation": "Apply least privilege to the configured layer: scope the credential/tool grant to the verbs in the recorded intent, and add an explicit approval for any remaining consequential verb.",
+        "verification_test": "Attempt the now-unneeded verb. PASS = denied without approval; FAIL = still allowed.",
+        "status": "failed",
+        "banned_phrases_checked": true
+      },
+      "verification": "failed",
+      "verification_evidence": "EV-02: dry-run deploy still succeeded via group membership"
+    }
+  ],
+  "attack_paths": [],
+  "unknowns": [
+    {
+      "id": "U-write",
+      "area": "observed capability",
+      "question": "What can this agent actually do for verb 'write'?",
+      "consequence_if_true": "Unverified write authority on an agent whose intent does not forbid it.",
+      "needed_evidence": "A direct test or log review exercising 'write' (see verification plan)."
+    },
+    {
+      "id": "U-execute",
+      "area": "observed capability",
+      "question": "What can this agent actually do for verb 'execute'?",
+      "consequence_if_true": "Unverified execute authority on an agent whose intent does not forbid it.",
+      "needed_evidence": "A direct test or log review exercising 'execute' (see verification plan)."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "EV-01",
+      "kind": "config",
+      "source": "service-account-iam.json",
+      "summary": "pre-remediation: service account held prod deploy",
+      "collected_at": "2026-09-30",
+      "sha256": "",
+      "supports": [
+        "F-01"
+      ]
+    },
+    {
+      "id": "EV-02",
+      "kind": "test",
+      "source": "dry-run deploy after remediation",
+      "summary": "deploy still succeeded via an inherited group membership the fix missed",
+      "collected_at": "2026-09-30",
+      "sha256": "",
+      "supports": []
+    }
+  ],
+  "gates": [
+    {
+      "gate": "G1",
+      "name": "Scope authorization",
+      "decided_by": "Dana (CTO)",
+      "decision": "approved",
+      "at": "",
+      "minutes": 2.0,
+      "note": "scope approved: sandbox + fixture targets"
+    },
+    {
+      "gate": "G2",
+      "name": "Intent confirmation",
+      "decided_by": "Dana (CTO)",
+      "decision": "approved",
+      "at": "",
+      "minutes": 5.0,
+      "note": "intent confirmed as written"
+    },
+    {
+      "gate": "G4",
+      "name": "Risk acceptance / final adjudication",
+      "decided_by": "Dana (CTO)",
+      "decision": "approved",
+      "at": "",
+      "minutes": 10.0,
+      "note": "residual risk accepted; retest in 30 days"
+    }
+  ],
+  "metrics": {
+    "total_assessment_minutes": 4.0,
+    "human_active_minutes": 17.0,
+    "human_intervention_ratio": 4.25,
+    "human_interventions": 3,
+    "policy_authorized_gates": 0,
+    "autonomous_steps": 8,
+    "autonomous_completion_rate": 0.7273,
+    "findings_needing_adjudication": 0,
+    "false_positive_or_rejected_findings": 0,
+    "target_hir_max": 0.1,
+    "hir_target_met": false
+  },
+  "executive_summary": "Assessed 'ci-agent-08': 1 findings (High=1), 0 composed attack paths, 2 open unknowns. Most consequential possible action: UNKNOWN \u2014 no consequential observed capability could be stated. HIR 4.25 (target <= 0.10).",
+  "most_consequential_action": "UNKNOWN \u2014 no consequential observed capability could be stated",
+  "limitations": []
+}
