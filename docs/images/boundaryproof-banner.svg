@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-label="BoundaryProof — intended vs configured vs observed authority, checked verb by verb, with evidence">
+  <rect width="1280" height="640" fill="#F4F0E6"/>
+  <rect x="0" y="0" width="1280" height="10" fill="#111410"/>
+  <text x="80" y="105" font-family="ui-monospace, Menlo, monospace" font-size="24" letter-spacing="4" fill="#1F5638">BOUNDARYPROOF v0.1</text>
+  <text x="80" y="225" font-family="Georgia, 'Times New Roman', serif" font-size="96" font-weight="bold" fill="#111410">BoundaryProof</text>
+  <text x="80" y="290" font-family="Georgia, 'Times New Roman', serif" font-size="30" font-style="italic" fill="#3d3d3d">Authority-boundary auditing for AI agents</text>
+  <g font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="27" fill="#111410">
+    <rect x="80" y="350" width="300" height="64" rx="10" fill="#ffffff" stroke="#111410" stroke-width="2"/>
+    <text x="230" y="391" text-anchor="middle">INTENDED</text>
+    <rect x="490" y="350" width="300" height="64" rx="10" fill="#ffffff" stroke="#111410" stroke-width="2"/>
+    <text x="640" y="391" text-anchor="middle">CONFIGURED</text>
+    <rect x="900" y="350" width="300" height="64" rx="10" fill="#A9D44D" stroke="#111410" stroke-width="2"/>
+    <text x="1050" y="391" text-anchor="middle">OBSERVED</text>
+  </g>
+  <g font-family="Georgia, serif" font-size="36" fill="#1F5638">
+    <text x="415" y="395" text-anchor="middle">&#8594;</text>
+    <text x="825" y="395" text-anchor="middle">&#8594;</text>
+  </g>
+  <text x="80" y="480" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="27" fill="#3d3d3d">Checked verb by verb, with evidence. Where the columns disagree, that is a finding.</text>
+  <rect x="80" y="515" width="1120" height="6" fill="#A9D44D"/>
+  <text x="80" y="575" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="28" fill="#111410">11 verbs &#183; 10 required outputs &#183; 8 fixtures &#183; 48 tests &#183; stdlib only</text>
+</svg>
