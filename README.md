@@ -1,27 +1,29 @@
+<p align="center">
+  <img src="docs/images/boundaryproof-banner.svg" alt="BoundaryProof — intended vs configured vs observed authority, checked verb by verb, with evidence" width="100%">
+</p>
+
 # BoundaryProof v0.1
 
-**Authority-boundary auditing for AI agents.** Answers one question: *what is the most
-consequential thing this agent can actually do, and can we prove that boundary matches
-what the human intended?*
+**Authority-boundary auditing for AI agents.**
 
-The thesis: every agent has three columns of authority — **intended** (what the human
-delegated), **configured** (what the platform/tools allow), **observed** (what the agent
-demonstrably does). Where the columns disagree, you have a candidate finding. Where a
-column is blank, that blank is evidence — it is never silently converted into an
-assumption.
+[![Python](https://img.shields.io/badge/python-3.10%2B-111410)](https://www.python.org)
+[![Dependencies](https://img.shields.io/badge/dependencies-stdlib_only-1F5638)](boundaryproof/)
+[![Tests](https://img.shields.io/badge/tests-48_passing-A9D44D)](tests/)
+[![License](https://img.shields.io/badge/license-MIT-black)](LICENSE)
+
+## Why this exists
+
+BoundaryProof answers one question: *what is the most consequential thing this agent can actually do, and can we prove that boundary matches what the human intended?*
+
+The thesis: every agent has three columns of authority — **intended** (what the human delegated), **configured** (what the platform/tools allow), **observed** (what the agent demonstrably does). Where the columns disagree, you have a candidate finding. Where a column is blank, that blank is evidence — it is never silently converted into an assumption.
 
 ## The 11 verbs
 
-The authority taxonomy is fixed and closed: `read, write, execute, commit, delete,
-deploy, send_external, transact, approve, delegate, escalate`. The engine does not
-expand it. Exfiltration is a *composed* finding (read + send_external chained), not a
-12th verb.
+The authority taxonomy is fixed and closed: `read, write, execute, commit, delete, deploy, send_external, transact, approve, delegate, escalate`. The engine does not expand it. Exfiltration is a *composed* finding (read + send_external chained), not a 12th verb.
 
 ## The 10 required outputs
 
-Every assessment produces: authority map · I/C/O matrix · findings · severity /
-likelihood / blast radius per finding · attack paths · evidence per finding ·
-remediation · retest result · explicit unknowns · executive summary.
+Every assessment produces: authority map · I/C/O matrix · findings · severity / likelihood / blast radius per finding · attack paths · evidence per finding · remediation · retest result · explicit unknowns · executive summary.
 
 ## Quickstart
 
@@ -74,48 +76,41 @@ Verb states are `YES | PARTIAL | NO | UNKNOWN`. Blank = `UNKNOWN`, never an assu
 
 ## Human-in-the-loop
 
-Humans intervene at exactly four gates: **G1** scope authorization, **G2** intent
-confirmation, **G3** consequential-test approval, **G4** risk acceptance / final
-adjudication. The ledger tracks total effort, human active minutes, the Human
-Intervention Ratio (human minutes ÷ total assessment minutes, target ≤ 0.10),
-intervention count, autonomous completion rate, findings needing adjudication, and
-verification rates. Without explicit G3 approval, every consequential test is blocked,
-not skipped — the gap is recorded as unverified, never as a pass.
+Humans intervene at exactly four gates: **G1** scope authorization, **G2** intent confirmation, **G3** consequential-test approval, **G4** risk acceptance / final adjudication. The ledger tracks total effort, human active minutes, the Human Intervention Ratio (human minutes ÷ total assessment minutes, target ≤ 0.10), intervention count, autonomous completion rate, findings needing adjudication, and verification rates. Without explicit G3 approval, every consequential test is blocked, not skipped — the gap is recorded as unverified, never as a pass.
 
-Gate decisions can be pre-supplied via `--policy` (pre-authorization, recorded as
-`policy_authorized` and never counted as human intervention) or `--human` (a real
-person's recorded decisions, counted toward HIR). See `docs/hitl-gates.md`.
+Gate decisions can be pre-supplied via `--policy` (pre-authorization, recorded as `policy_authorized` and never counted as human intervention) or `--human` (a real person's recorded decisions, counted toward HIR). See `docs/hitl-gates.md`.
 
 ## Fixtures
 
-Eight canonical scenarios in `fixtures/` (see `docs/fixtures.md`): aligned;
-observed exceeds intended; configured exceeds intended but unverifiable; configured
-restricted but observed violates; insufficient evidence; delegated authority exceeds
-parent; remediation verified; remediation failed.
+Eight canonical scenarios in `fixtures/` (see `docs/fixtures.md`): aligned; observed exceeds intended; configured exceeds intended but unverifiable; configured restricted but observed violates; insufficient evidence; delegated authority exceeds parent; remediation verified; remediation failed.
+
+## Documents
+
+| Document | What it covers |
+|---|---|
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Architecture decisions — a pipeline of scoped stages |
+| [`docs/schema.md`](docs/schema.md) | The agent dossier schema |
+| [`docs/evidence-model.md`](docs/evidence-model.md) | What counts as evidence, and what never does |
+| [`docs/hitl-gates.md`](docs/hitl-gates.md) | The four human gates and the effort ledger |
+| [`docs/severity-and-mismatch-logic.md`](docs/severity-and-mismatch-logic.md) | Severity, likelihood, blast radius, mismatch rules |
+| [`docs/fixtures.md`](docs/fixtures.md) | The eight canonical scenarios |
+| [`docs/workers.md`](docs/workers.md) | Worker (stage) responsibilities and the independence property |
 
 ## What I deliberately did NOT build
 
 - No network calls anywhere in the engine. An authority auditor must not phone home.
-- No severity model based on exploitability/CVSS-style scoring — severity is ranked
-  by business consequence, not attacker cleverness.
+- No severity model based on exploitability/CVSS-style scoring — severity is ranked by business consequence, not attacker cleverness.
 - No 12th verb, no custom taxonomy, no auto-discovery of "new" verbs.
-- No LLM-judged evidence. `make_evidence` accepts only `direct | test | log |
-  config | human_attested` kinds; an LLM opinion is not evidence and has no kind.
+- No LLM-judged evidence. `make_evidence` accepts only `direct | test | log | config | human_attested` kinds; an LLM opinion is not evidence and has no kind.
 - No silent conversion of UNKNOWN to YES or NO anywhere in the pipeline.
-- No consequential test execution without an explicit G3 decision. Blocked tests
-  stay blocked and visible.
-- No SIEM, runtime firewall, IAM replacement, vulnerability scanner, compliance
-  platform, red-team platform, or observability platform (per brief anti-scope-creep).
-- No credential storage, no secret handling, no invented configs/permissions/vulns —
-  insufficient evidence yields UNKNOWN or NEEDS HUMAN REVIEW, never a finding.
+- No consequential test execution without an explicit G3 decision. Blocked tests stay blocked and visible.
+- No SIEM, runtime firewall, IAM replacement, vulnerability scanner, compliance platform, red-team platform, or observability platform (per brief anti-scope-creep).
+- No credential storage, no secret handling, no invented configs/permissions/vulns — insufficient evidence yields UNKNOWN or NEEDS HUMAN REVIEW, never a finding.
 - No auto-remediation. The engine proposes; humans apply; the engine re-verifies.
 
 ## Known limitations
 
-See `KNOWN_LIMITATIONS.md`. The honest headline: v0.1 reasons over *described*
-agents, not live ones — observations and test results are supplied, not gathered by
-the engine. The fixture executor simulates execution semantics (including G3
-blocking); live probing is deliberately out of scope for v0.1.
+See `KNOWN_LIMITATIONS.md`. The honest headline: v0.1 reasons over *described* agents, not live ones — observations and test results are supplied, not gathered by the engine. The fixture executor simulates execution semantics (including G3 blocking); live probing is deliberately out of scope for v0.1.
 
 ## Layout
 
