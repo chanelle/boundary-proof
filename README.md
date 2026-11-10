@@ -11,6 +11,8 @@
 [![Tests](https://img.shields.io/badge/tests-48_passing-A9D44D)](tests/)
 [![License](https://img.shields.io/badge/license-MIT-black)](LICENSE)
 
+> **New here?** Follow the [5-minute developer walkthrough](docs/START_HERE.md), read the [product overview](docs/PRODUCT.md), or review the [known limitations](KNOWN_LIMITATIONS.md). Product Hunt copy is a [draft](docs/PRODUCT_HUNT_DRAFT.md), not a published launch.
+
 ## Why this exists
 
 BoundaryProof answers one question: *what is the most consequential thing this agent can actually do, and can we prove that boundary matches what the human intended?*
