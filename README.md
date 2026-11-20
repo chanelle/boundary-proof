@@ -8,7 +8,7 @@
 
 [![Python](https://img.shields.io/badge/python-3.10%2B-111410)](https://www.python.org)
 [![Dependencies](https://img.shields.io/badge/dependencies-stdlib_only-1F5638)](boundaryproof/)
-[![Tests](https://img.shields.io/badge/tests-60_passing-A9D44D)](tests/)
+[![Tests](https://img.shields.io/badge/tests-62_passing-A9D44D)](tests/)
 [![License](https://img.shields.io/badge/license-MIT-black)](LICENSE)
 
 ## Why this exists
@@ -125,7 +125,7 @@ boundaryproof/   the engine (13 stages, stdlib-only)
 fixtures/        8 canonical scenarios + f09 demo scenario
 demo/            buyer demo (static site, synthetic data)
 policies/        example gate pre-authorizations
-tests/           60 automated tests (53 engine + 7 demo data)
+tests/           62 automated tests (55 engine + 7 demo data)
 samples/         completed assessments rendered from fixtures
 docs/            architecture, schema, evidence model, gates, severity, fixtures
 ```

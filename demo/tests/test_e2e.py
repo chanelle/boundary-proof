@@ -91,6 +91,7 @@ class DemoE2E(unittest.TestCase):
             pg.click("#next")
         self.assertTrue(pg.is_visible(".scene[data-scene=intervene].active"))
         self.assertIn("ENGINE OUTPUT", pg.inner_text("#finding-card"))
+        self.assertIn("U-attempt-send_external", pg.inner_text("#finding-card"))
         pg.click("[data-mode=enforce]")
         self.assertIn("CONCEPT SIMULATION", pg.inner_text("[data-pane=enforce]").upper())
         self.assertIn("DENY PENDING APPROVAL", pg.inner_text("#gate-trace"))

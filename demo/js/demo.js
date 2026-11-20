@@ -74,6 +74,7 @@
     "<span>" + finding.id + " · " + esc(finding.title) + "</span>" +
     "<span class='label'>Severity " + finding.severity + " · Confidence " + finding.confidence + "</span>" +
     "<span class='label'>Evidence " + finding.evidence_ids.join(", ") + "</span>" +
+    (finding.unknown_ids.length ? "<span class='label alert'>Open " + finding.unknown_ids.join(", ") + "</span>" : "") +
     "<span class='label'>Policy source: " + esc(row.configured_provenance) + "</span>" +
     "<span class='label'>Attempt at " + hhmmss(exportCall.at) + " UTC</span>" +
     "<span class='tag engine' style='margin-left:auto'>Engine output</span>";
@@ -98,6 +99,7 @@
     "<div>Evidence</div><div>" + finding.evidence_ids.join(", ") + "</div>" +
     "<div>Remediation</div><div>" + esc(rem.recommendation) + " <span class='muted'>(" + esc(rem.status) + ")</span>" + "</div>" +
     "<div>Verification</div><div>" + esc(finding.verification) + "</div>" +
+    "<div>Open unknowns</div><div>" + (finding.unknown_ids.length ? "<span class='alert'>" + finding.unknown_ids.join(", ") + "</span> <span class='muted'>(did the attempt complete?)</span>" : "none") + "</div>" +
     "</div>";
 
   // Simulated gate replay

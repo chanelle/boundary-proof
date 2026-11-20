@@ -38,7 +38,7 @@ python3 demo/tools/record_walkthrough.py # records video/out/walkthrough.{webm,m
 ## Tests
 
 ```bash
-python3 -m unittest discover -s tests    # 48 original + 5 attempted-action engine tests + 7 demo-data tests
+python3 -m unittest discover -s tests    # 48 original + 7 attempted-action engine tests + 7 demo-data tests
 node --test demo/tests/*.test.js         # 21 unit tests: assignment, analytics, gate, scenario/engine agreement, copy
 python3 demo/tests/test_e2e.py           # 5 browser tests (skips if Playwright/Chrome missing)
 ```

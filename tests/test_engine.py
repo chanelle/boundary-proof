@@ -224,3 +224,15 @@ class TestCli(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestAttemptUnknownLinking(unittest.TestCase):
+    def test_f09_finding_links_attempt_unknown(self):
+        a = engine.run(load("f09_permission_nobody_gave.json"), policy=AUTO)
+        f = next(x for x in a.findings if x.mismatch.verb == "send_external")
+        self.assertEqual(f.unknown_ids, ["U-attempt-send_external"])
+        self.assertIn("U-attempt-send_external", engine.render_markdown(a))
+
+    def test_findings_without_attempts_have_no_attempt_links(self):
+        a = engine.run(load("f02_observed_exceeds_intended.json"), policy=AUTO)
+        self.assertFalse(any(u.startswith("U-attempt") for f in a.findings for u in f.unknown_ids))

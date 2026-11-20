@@ -40,6 +40,7 @@ Every serious finding in this report comes from a column mismatch below.
 **Detail:** Configured permission (YES) exceeds delegated intent (NO); actual behavior is UNKNOWN. Over-broad configuration with no compensating control.
 
 **Evidence:** EV-01, EV-02, EV-05
+**Open unknowns:** U-attempt-send_external
 
 **Remediation (proposed):** Apply least privilege to the configured layer: scope the credential/tool grant to the verbs in the recorded intent, and add an explicit approval for any remaining consequential verb.
 

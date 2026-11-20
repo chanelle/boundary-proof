@@ -166,6 +166,12 @@ def run(doc: Dict[str, Any],
     reach_ctx = doc.get("reach_context", {})
     evidence_hints = doc.get("evidence_hints", {})
     found = finding_mod.synthesize(mismatches, store, reach_ctx, evidence_hints)
+    # Link attempted-action unknowns to findings on the same verb, so a
+    # finding never reads as settled while its attempt's outcome is open.
+    for f in found:
+        uid = f"U-attempt-{f.mismatch.verb}"
+        if uid in store.unknowns and uid not in f.unknown_ids:
+            f.unknown_ids.append(uid)
     ledger.step()
 
     # ---- Attack paths ----

@@ -97,7 +97,9 @@ window.MIMO_ENGINE = {
         },
         "severity": "Critical",
         "title": "Configured Exceeds Intended \u2014 'send_external'",
-        "unknown_ids": [],
+        "unknown_ids": [
+          "U-attempt-send_external"
+        ],
         "verification": "pending",
         "verification_evidence": ""
       },

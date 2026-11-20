@@ -5,7 +5,7 @@
 1. **No runtime enforcement exists.** The policy gate is `MimoCore.policyGate`, a pure function replaying a synthetic trace inside the page. It is not connected to any agent runtime and has never blocked a real call. It is labeled `CONCEPT SIMULATION · NOT LIVE ENFORCEMENT` everywhere it appears.
 2. **No live monitoring.** BoundaryProof v0.1 reasons over a supplied dossier. The trace in the demo is written by hand, not captured from an agent.
 3. **Attempts are evidence plus an unknown, not a cell state.** Verb cells stay `YES | PARTIAL | NO | UNKNOWN`. An observation marked `attempted: true` with `result: UNKNOWN` now makes the engine open `U-attempt-<verb>` regardless of intent, and the cell stays UNKNOWN. Deliberately not a fifth state: an attempt shows intent to act, not capability, and a new state would ripple through mismatch, merge and severity logic. The attempt flag is supplied in the dossier; the engine does not detect attempts itself.
-4. **Attempt unknowns are not linked to findings.** `U-attempt-send_external` sits in the unknown register; F-01's `unknown_ids` is still empty. Linking them is a small follow-up.
+4. **Attempt unknowns link by verb only.** A finding picks up `U-attempt-<verb>` when it is about the same verb (F-01 → `U-attempt-send_external`). Two different attempts on the same verb collapse into one unknown.
 5. **Verbs are not resource-scoped.** `read` covers tickets and customer records alike. The intent limits (`read_scope: support tickets only`) are carried as text and not evaluated.
 6. **`customers.export` → `send_external` is a modeling choice.** An export to internal storage would map to `read` + `write` and produce a different finding. The fixture states the destination is external.
 7. **Severity is Critical, confidence Medium, on configuration alone.** That is the engine's real output given `customer_data_in_reach: true` and no compensating control. Expect a buyer to ask why Critical without observed exfiltration. The honest answer: severity ranks business consequence; confidence carries the evidence strength.
@@ -25,7 +25,7 @@
 
 ### Automated (run before every showing)
 
-- [ ] `python3 -m unittest discover -s tests` → 60 pass (48 original + 5 attempted-action + 7 demo data)
+- [ ] `python3 -m unittest discover -s tests` → 62 pass (48 original + 7 attempted-action + 7 demo data)
 - [ ] `node --test demo/tests/*.test.js` → 21 pass
 - [ ] `python3 demo/tests/test_e2e.py` → 5 pass (variants share DOM; stable assignment; full funnel events; simulation labels; no external requests; no console errors; no horizontal overflow at 360 px)
 - [ ] `python3 demo/build_demo_data.py && git diff --exit-code demo/data` → no drift
