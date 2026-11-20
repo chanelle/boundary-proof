@@ -2,7 +2,7 @@
 
 Run from repo root (needs Playwright + Chrome/Chromium; ffmpeg for MP4):
     python3 demo/tools/record_walkthrough.py
-Output: demo/video/out/walkthrough.webm and walkthrough.mp4 (git-ignored).
+Output: demo/video/out/walkthrough-16x9.mp4 (1920x1080) and walkthrough-4x5.mp4\n(1080x1350, phone layout for LinkedIn/mobile feeds). Git-ignored.\nRecord one format: python3 demo/tools/record_walkthrough.py 4x5
 The page is opened with ?autoplay=1, which tags the session as a recording
 and excludes its events from experiment metrics.
 """
@@ -13,6 +13,7 @@ import http.server
 import os
 import shutil
 import subprocess
+import sys
 import threading
 
 from playwright.sync_api import sync_playwright
@@ -26,7 +27,19 @@ class Quiet(http.server.SimpleHTTPRequestHandler):
         pass
 
 
+FORMATS = {
+    # name: (viewport w, h, output w, h)
+    "16x9": (1600, 900, 1920, 1080),
+    "4x5": (432, 540, 1080, 1350),   # mobile feed cut, uses the phone layout
+}
+
+
 def main() -> None:
+    for name in sys.argv[1:] or FORMATS:
+        record(name, *FORMATS[name])
+
+
+def record(name: str, vw: int, vh: int, ow: int, oh: int) -> None:
     os.makedirs(OUT, exist_ok=True)
     httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(Quiet, directory=DEMO))
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
@@ -36,9 +49,9 @@ def main() -> None:
             browser = p.chromium.launch(channel="chrome")
         except Exception:
             browser = p.chromium.launch()
-        ctx = browser.new_context(viewport={"width": 1600, "height": 900},
+        ctx = browser.new_context(viewport={"width": vw, "height": vh},
                                   device_scale_factor=1,
-                                  record_video_dir=OUT, record_video_size={"width": 1600, "height": 900})
+                                  record_video_dir=OUT, record_video_size={"width": vw, "height": vh})
         page = ctx.new_page()
         page.goto(url)
         page.wait_for_selector("html[data-autoplay-done='1']", timeout=90_000)
@@ -46,14 +59,14 @@ def main() -> None:
         video = page.video
         ctx.close()
         browser.close()
-        webm = os.path.join(OUT, "walkthrough.webm")
+        webm = os.path.join(OUT, f"walkthrough-{name}.webm")
         shutil.move(video.path(), webm)
     httpd.shutdown()
     print("wrote", os.path.relpath(webm))
     if shutil.which("ffmpeg"):
-        mp4 = os.path.join(OUT, "walkthrough.mp4")
+        mp4 = os.path.join(OUT, f"walkthrough-{name}.mp4")
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", webm, "-c:v", "libx264", "-preset", "veryfast",
-                        "-crf", "20", "-vf", "scale=1920:1080:flags=lanczos", "-pix_fmt", "yuv420p", "-r", "30", "-movflags", "+faststart", mp4], check=True)
+                        "-crf", "20", "-vf", f"scale={ow}:{oh}:flags=lanczos", "-pix_fmt", "yuv420p", "-r", "30", "-movflags", "+faststart", mp4], check=True)
         print("wrote", os.path.relpath(mp4))
 
 

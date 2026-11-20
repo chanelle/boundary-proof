@@ -41,33 +41,17 @@
   <div class="blk"><h2>What it is not</h2><p>Not runtime enforcement, monitoring, or a scanner. The underlying engine reasons over described and recorded agent behavior; it does not probe live agents.</p></div>
 
   <div class="blk" id="request">
-    <h2>Request a walkthrough</h2>
+    <h2>Book a discovery call</h2>
     <div>
-      <p style="margin-bottom:18px">Would a 20-minute walkthrough of your agent workflow be useful?</p>
-      <form class="req" id="req-form" novalidate>
-        <label>Work email<input type="email" name="email" autocomplete="email" required></label>
-        <label>Role
-          <select name="role" required>
-            <option value="">Select</option>
-            <option value="platform">AI platform lead</option>
-            <option value="agent_eng">Agent / ML engineering</option>
-            <option value="security">AI security / CISO org</option>
-            <option value="governance">AI governance / risk</option>
-            <option value="exec">Executive / budget owner</option>
-            <option value="other">Other</option>
-          </select>
-        </label>
-        <label class="full">Tool-connected agents today?
-          <select name="agents" required>
-            <option value="">Select</option>
-            <option value="production">Yes, in production</option>
-            <option value="pilot">In pilot or internal use</option>
-            <option value="exploring">Exploring, none deployed</option>
-          </select>
-        </label>
-        <div class="full"><button class="btn" type="submit">Request walkthrough <span class="arrow" aria-hidden="true">→</span></button></div>
-        <p class="full notice" id="req-notice" aria-live="polite">Prototype notice: this form has no backend. Submitting sends nothing anywhere. Only non-identifying fields (role category, deployment stage, work-email yes/no) are written to this browser's local mock analytics log; your email is never stored.</p>
-      </form>
+      <p style="margin-bottom:14px">Would a 20-minute walkthrough of one of your agent workflows be useful?</p>
+      <ul style="margin-bottom:20px">
+        <li><b>What you're booking:</b> a product discovery call with Chanelle Henry, founder. The booking page offers a 30-minute slot; the walkthrough takes about 20 minutes, the rest is your questions.</li>
+        <li><b>What we cover:</b> which agents have tool access today, who decides what they may do, and whether you can tell an attempted action from a completed one.</li>
+        <li><b>What we don't need:</b> production access, customer data, or credentials. Describing the workflow is enough.</li>
+        <li><b>What happens after:</b> if there's a fit, a scoped proposal for the Authority Gap Review. No obligation.</li>
+      </ul>
+      <a class="btn" id="book-cta" href="https://cal.com/chanelleh" target="_blank" rel="noopener">Choose a time on Cal.com <span class="arrow" aria-hidden="true">↗</span></a>
+      <p class="notice" style="margin-top:18px">Opens Chanelle's Cal.com booking page (cal.com/chanelleh) in a new tab. Nothing is booked until you confirm a time there. This page doesn't see or store your booking.</p>
     </div>
   </div>
 </main>
@@ -79,17 +63,11 @@
 
 <script>
 (function () {
-  var M = window.Mimo, C = window.MimoCore;
-  document.getElementById("req-form").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var f = e.target;
-    var res = C.qualify({ email: f.email.value, role: f.role.value, agents: f.agents.value });
-    if (res.qualified) M.analytics.track("qualified_request", res.props);
-    var n = document.getElementById("req-notice");
-    n.textContent = res.qualified
-      ? "Recorded locally as a qualified request (mock). Nothing was sent. In the live version this would reach the founder by email."
-      : "Recorded nothing: not counted as qualified (" + res.reasons.join("; ") + "). Nothing was sent.";
-    f.email.value = "";
+  var M = window.Mimo;
+  // Records only that the handoff link was clicked. A booking happens on
+  // Cal.com; qualified_request is logged by the operator once one arrives.
+  document.getElementById("book-cta").addEventListener("click", function () {
+    M.analytics.track("pilot_cta_click", { from: "pilot_page", handoff: "calcom" });
   });
 })();
 </script>

@@ -51,11 +51,17 @@
   </div>
 
   <section class="section">
-    <div class="grid3">
-      <div><span class="label">01 · Intended</span><h3>What a person asked for</h3><p>The task as delegated, with its source and timestamp. Not inferred from what the agent happened to do.</p></div>
-      <div><span class="label">02 · Configured</span><h3>What the tools permit</h3><p>Every grant in the tool policy, mapped to one of eleven authority verbs, with the file it came from.</p></div>
-      <div><span class="label">03 · Observed</span><h3>What the evidence establishes</h3><p>Attempted is not completed. Where the trace is silent, the answer is UNKNOWN, and the report says so.</p></div>
+    <span class="label">What Mimo answers</span>
+    <h2 style="margin-top:12px;max-width:20em">What can you actually prove about this agent's authority and behavior?</h2>
+    <p class="subhead" style="max-width:40em">Most tools give you a permission list or a risk score. Mimo separates five things that usually get blurred together, and ties each one to a record.</p>
+    <div class="ladder">
+      <div><span class="label">01 · Authority</span><h3>What a person asked for</h3><p>The task as delegated, with its source and time.</p></div>
+      <div><span class="label">02 · Capability</span><h3>What the tools permit</h3><p>Every grant, mapped to one of eleven authority verbs.</p></div>
+      <div><span class="label">03 · Attempts</span><h3>What it tried</h3><p>A recorded request is an attempt, not proof of an outcome.</p></div>
+      <div><span class="label">04 · Completed</span><h3>What it finished</h3><p>Only claimed when a response or receipt shows it.</p></div>
+      <div class="unk"><span class="label">05 · Unresolved</span><h3>What nobody can say yet</h3><p>Kept as open questions with the evidence that would close them.</p></div>
     </div>
+    <p class="disclosure">Mimo reasons over the evidence you provide: task records, tool policies, traces. It does not monitor agents live or block actions; enforcement in the demo is a labeled concept simulation.</p>
   </section>
 
   <section class="section" style="padding-top:0">

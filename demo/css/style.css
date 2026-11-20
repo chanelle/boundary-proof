@@ -139,6 +139,13 @@ h1 em { font-style: italic; color: var(--accent); font-weight: 400; }
 .grid3 h3 { font-family: var(--serif); font-weight: 500; font-size: 24px; margin: 10px 0 8px; }
 .grid3 p { color: var(--soft); margin: 0; font-size: 16px; }
 
+.ladder { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: var(--stroke) solid var(--line); margin-top: 28px; }
+.ladder > div { padding: 22px 18px 22px 0; border-right: 1px solid var(--line); }
+.ladder > div + div { padding-left: 18px; }
+.ladder > div:last-child { border-right: 0; }
+.ladder h3 { font-family: var(--serif); font-weight: 500; font-size: 22px; margin: 10px 0 6px; line-height: 1.15; }
+.ladder p { color: var(--soft); margin: 0; font-size: 15px; }
+.ladder .unk h3 { color: var(--alert); }
 .pilot-band { display: grid; grid-template-columns: minmax(0, 1.4fr) auto; gap: 32px; align-items: end; border: var(--stroke) solid var(--line); border-radius: var(--r); padding: clamp(24px, 4vw, 48px); }
 .pilot-band p { color: var(--soft); margin: 0; }
 
@@ -290,6 +297,26 @@ table.matrix tr.hot td:first-child { color: var(--alert); }
 .endcard { min-height: 52vh; display: flex; flex-direction: column; justify-content: center; }
 .endcard h2 { font-size: clamp(40px, 6.4vw, 96px) !important; max-width: 13em; }
 
+/* hook: the four-line executive opening */
+.hook { list-style: none; margin: 2vh 0 0; padding: 0; display: grid; gap: clamp(10px, 2.2vh, 28px); }
+.hook li { opacity: 0; transform: translateY(10px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.hook li.show { opacity: 1; transform: none; }
+.hook .line { font-family: var(--serif); font-weight: 500; letter-spacing: -.025em; line-height: 1.04; font-size: clamp(24px, min(5.4vw, 7.4vh), 84px); font-variation-settings: "opsz" 144; max-width: 16em; }
+.hook li.alert .line { color: var(--alert); }
+.hook li.unknown .line em { font-style: italic; color: var(--soft); text-decoration: underline dashed var(--alert); text-decoration-thickness: 2px; text-underline-offset: .14em; }
+.hook .ref { margin-top: 8px; font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.hook-foot { margin-top: 3vh; opacity: 0; transition: opacity .6s var(--ease); }
+.hook-foot.show { opacity: 1; }
+
+/* the three separate answers on the finding */
+.triad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.triad .t { border: var(--stroke) solid var(--line); border-radius: var(--r); padding: 18px; background: var(--bg-2); }
+.triad .t.unk { border-style: dashed; border-color: var(--alert); background: repeating-linear-gradient(135deg, transparent 0 7px, rgba(255,90,78,.05) 7px 8px); }
+.triad .k { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.triad .v { font-family: var(--serif); font-size: clamp(26px, 2.6vw, 36px); line-height: 1.1; margin: 8px 0 6px; font-variation-settings: "opsz" 96; }
+.triad .q { font-size: 14px; color: var(--soft); line-height: 1.4; }
+.triad .src { margin-top: 10px; font-family: var(--mono); font-size: 10px; letter-spacing: .08em; color: var(--muted); }
+
 /* captions (autoplay) */
 .captions { position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); max-width: min(920px, 92vw); background: rgba(14,15,13,.92); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 18px; font-family: var(--serif); font-size: clamp(18px, 1.8vw, 24px); line-height: 1.35; text-align: center; z-index: 30; display: none; }
 .captions.on { display: block; }
@@ -329,9 +356,12 @@ form.req .full { grid-column: 1 / -1; }
   .ico .col { border-right: 0; border-bottom: 1px solid var(--line); }
   .ico .col:last-child { border-bottom: 0; }
   .states { grid-template-columns: 1fr 1fr; }
+  .triad { grid-template-columns: 1fr; }
   .grid3 { grid-template-columns: 1fr; }
+  .ladder { grid-template-columns: 1fr; }
+  .ladder > div, .ladder > div + div { padding: 18px 0; border-right: 0; border-bottom: 1px solid var(--line); }
   .grid3 > div, .grid3 > div + div { padding: 22px 0; border-right: 0; border-bottom: 1px solid var(--line); }
-  .pilot-band { grid-template-columns: 1fr; }
+.pilot-band { grid-template-columns: 1fr; }
   .doc .blk { grid-template-columns: 1fr; gap: 8px; }
   form.req { grid-template-columns: 1fr; }
   .bar nav a.hide-sm { display: none; }
@@ -351,7 +381,9 @@ form.req .full { grid-column: 1 / -1; }
   .cell-state { min-width: 0; width: 100%; font-size: 9px; padding: 3px 2px; }
   .controls .hint { display: none; }
   #demo-title { display: none; }
-  .captions { bottom: 76px; }
+  .captions { bottom: 76px; font-size: 16px; padding: 8px 12px; }
+  body.autoplay .captions { bottom: 10px; }
+  .hook .ref { font-size: 10px; margin-top: 4px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }

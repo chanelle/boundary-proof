@@ -25,6 +25,11 @@
   var autoplay = M.params.autoplay === "1";
 
   // ---------- static fills ----------
+  $("#hook-lines").innerHTML = S.hook.map(function (h) {
+    var text = esc(h.text);
+    if (h.tone === "unknown") text = text.replace("We don&#39;t know.", "<em>We don&#39;t know.</em>");
+    return "<li class='" + h.tone + "'><div class='line'>" + text + "</div><div class='ref'>" + esc(h.ref) + "</div></li>";
+  }).join("");
   $("#req-id").textContent = S.request.id;
   $("#req-at").textContent = day(S.request.at) + " " + hhmmss(S.request.at) + " UTC";
   $("#req-text").textContent = "“" + S.request.text + "”";
@@ -85,6 +90,22 @@
       return "<tr" + (hot ? " class='hot'" : "") + "><td>" + r.verb + "</td><td>" + r.intended + "</td><td>" + r.configured + "</td><td>" + r.observed + "</td><td class='muted'>" + esc(r.configured_provenance) + "</td></tr>";
     }).join("");
 
+  // Three separate answers. Severity and confidence are engine output; the
+  // outcome comes from the evidence dossier (synthetic trace), not from Mimo
+  // observing anything live.
+  $("#triad").innerHTML =
+    "<div class='t'><div class='k'>Risk severity</div><div class='v'>" + finding.severity + "</div>" +
+    "<div class='q'>How bad it would be if true. Customer data was in reach and nothing compensates.</div>" +
+    "<div class='src'>ENGINE · " + finding.id + "</div></div>" +
+    "<div class='t'><div class='k'>Evidence confidence</div><div class='v'>" + finding.confidence + "</div>" +
+    "<div class='q'>How strong the proof is. Config + trace records, no direct test of the export.</div>" +
+    "<div class='src'>ENGINE · evidence " + finding.evidence_ids.join(", ") + "</div></div>" +
+    "<div class='t" + (exportStatus.completed === null ? " unk" : "") + "'><div class='k'>Action outcome</div><div class='v'>" +
+    (exportStatus.completed === null ? "Attempted.<br>Completion UNKNOWN." : esc(exportStatus.label)) + "</div>" +
+    "<div class='q'>What happened. The dossier records the request and no response.</div>" +
+    "<div class='src'>From the evidence dossier (" + exportCall.id + ", " + exportCall.evidence + "), not detected live · " +
+    (attemptUnknown ? attemptUnknown.id : "") + "</div></div>";
+
   // Finding card (engine)
   var rem = finding.remediation || {};
   $("#finding-card").innerHTML =
@@ -92,8 +113,6 @@
     "<h3>" + finding.id + " · " + esc(finding.title) + "</h3>" +
     "<div class='kv'>" +
     "<div>Triple</div><div>intended=" + finding.mismatch.intended + " / configured=" + finding.mismatch.configured + " / observed=" + finding.mismatch.observed + "</div>" +
-    "<div>Severity</div><div>" + finding.severity + " <span class='muted'>(business consequence)</span></div>" +
-    "<div>Confidence</div><div>" + finding.confidence + " <span class='muted'>(from evidence kind, not scariness)</span></div>" +
     "<div>Likelihood</div><div>" + esc(finding.likelihood) + "</div>" +
     "<div>Blast radius</div><div>" + esc(finding.blast_radius) + "</div>" +
     "<div>Evidence</div><div>" + finding.evidence_ids.join(", ") + "</div>" +
@@ -161,7 +180,17 @@
   function wait(ms, t) { return new Promise(function (res, rej) { setTimeout(function () { t === token ? res() : rej("stale"); }, ms); }); }
   function quiet(p) { return p.catch(function () {}); }
 
+  function runHook(t) {
+    var lis = $$("#hook-lines li");
+    lis.forEach(function (l) { l.classList.remove("show"); });
+    $("#hook-foot").classList.remove("show");
+    var p = wait(200, t);
+    lis.forEach(function (l, i) { p = p.then(function () { l.classList.add("show"); return wait(i === 2 ? 1400 : 1100, t); }); });
+    return p.then(function () { $("#hook-foot").classList.add("show"); });
+  }
+
   function enter(id, t) {
+    if (id === "hook") return quiet(runHook(t));
     if (id === "request") {
       $$("#steps li").forEach(function (li) { li.classList.remove("on"); });
       $$("#tickets .ticket").forEach(function (el) { el.classList.remove("show"); });
@@ -211,6 +240,8 @@
     var id = sceneIds[i];
     $$(".scene").forEach(function (s) { s.classList.toggle("active", s.getAttribute("data-scene") === id); });
     $$("#rail button").forEach(function (b, j) { b.classList.toggle("active", j === i); b.classList.toggle("done", j < i); b.setAttribute("aria-current", j === i ? "step" : "false"); });
+    var act = $$("#rail button")[i], rail = $("#rail");
+    if (act && rail.scrollTo) rail.scrollTo({ left: Math.max(0, act.offsetLeft - 24), behavior: "smooth" });
     $("#prev").disabled = i === 0;
     $("#next").disabled = i === sceneIds.length - 1;
     $("#pos").textContent = (i + 1) + " / " + sceneIds.length;
@@ -261,15 +292,29 @@
     var steps = S.walkthrough.slice();
     function act(step) {
       cap.textContent = step.caption;
+      cap.classList.toggle("on", !step.onScreen);
       var idx = sceneIds.indexOf(step.scene);
       var t;
-      switch (step.action) {
-        case "request":
+      if (/^hook-\d$/.test(step.action)) {
+        var n = +step.action.slice(5);
+        if (n === 0) {
           go(idx, { noEnter: true }); started = true;
           M.analytics.trackOnce("demo_start", { entry: "autoplay", mode: "autoplay" });
+          $$("#hook-lines li").forEach(function (l) { l.classList.remove("show"); });
+        }
+        $$("#hook-lines li")[n].classList.add("show");
+        if (n === 3) setTimeout(function () { $("#hook-foot").classList.add("show"); }, 2500);
+        return;
+      }
+      switch (step.action) {
+        case "finding": go(idx); setMode("audit"); break;
+        case "request":
+          go(idx, { noEnter: true });
           $$("#steps li").forEach(function (li) { li.classList.remove("on"); });
           $$("#tickets .ticket").forEach(function (el) { el.classList.remove("show"); });
           $("#summary").classList.remove("show");
+          t = token;
+          quiet(runWork(t).then(function () { return wait(400, t); }).then(function () { $("#summary").classList.add("show"); }));
           break;
         case "work": quiet(runWork(token)); break;
         case "summary": $("#summary").classList.add("show"); break;

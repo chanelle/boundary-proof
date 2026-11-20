@@ -66,7 +66,16 @@
 
   var syntheticCustomerRows = 2400;
 
+  // The four-line executive opening. Each line points at the record it rests on.
+  var hook = [
+    { text: "You asked your AI agent for a summary.", ref: "REQ-0412 · EV-01", tone: "plain" },
+    { text: "It had permission to export customer records.", ref: "customers.export granted · EV-02", tone: "plain" },
+    { text: "It attempted an export.", ref: "TC-7782 · EV-05", tone: "alert" },
+    { text: "Did it complete? We don't know. And that uncertainty matters.", ref: "U-attempt-send_external", tone: "unknown" }
+  ];
+
   var scenes = [
+    { id: "hook", label: "The short version" },
     { id: "request", label: "The request" },
     { id: "tools", label: "The tools" },
     { id: "attempt", label: "The attempt" },
@@ -78,32 +87,34 @@
 
   // 70-second scripted walkthrough. Single source for autoplay, captions
   // (WebVTT) and the transcript. t = seconds from start.
+  // In the hook (0-15 s) the statements are the on-screen text, so the
+  // caption bar stays hidden there (onScreen: true); the VTT still carries them.
   var walkthrough = [
-    { t: 0, end: 8, scene: "request", action: "request",
-      caption: "Your AI assistant was asked for a simple summary." },
-    { t: 8, end: 13, scene: "request", action: "work",
-      caption: "It reads twelve synthetic support tickets..." },
-    { t: 13, end: 18, scene: "request", action: "summary",
-      caption: "...and writes a useful five-theme summary." },
-    { t: 18, end: 24, scene: "attempt", action: "attempt",
-      caption: "Then one more tool call: customers.export, 2,400 rows." },
-    { t: 24, end: 30, scene: "attempt", action: "freeze",
-      caption: "Nobody asked it to do that." },
-    { t: 30, end: 38, scene: "gap", action: "columns",
-      caption: "Intended. Configured. Observed. Three columns that should agree." },
-    { t: 38, end: 45, scene: "gap", action: "attempt-vs-complete",
-      caption: "It was attempted. Whether it completed is unknown, and stays unknown." },
-    { t: 45, end: 51, scene: "proof", action: "drawer",
-      caption: "The evidence: task scope, tool grant, the attempted call, provenance." },
-    { t: 51, end: 57, scene: "proof", action: "unknowns",
-      caption: "Gaps in evidence are listed as gaps. Nothing is invented." },
-    { t: 57, end: 65, scene: "intervene", action: "enforce",
-      caption: "Concept simulation: a policy gate holds the export for human approval." },
+    { t: 0, end: 3, scene: "hook", action: "hook-0", onScreen: true, caption: hook[0].text },
+    { t: 3, end: 6, scene: "hook", action: "hook-1", onScreen: true, caption: hook[1].text },
+    { t: 6, end: 9, scene: "hook", action: "hook-2", onScreen: true, caption: hook[2].text },
+    { t: 9, end: 15, scene: "hook", action: "hook-3", onScreen: true, caption: hook[3].text },
+    { t: 15, end: 22, scene: "request", action: "request",
+      caption: "The request: summarize this week's complaints. The agent reads 12 synthetic tickets." },
+    { t: 22, end: 29, scene: "attempt", action: "attempt",
+      caption: "In between, one more call: customers.export, 2,400 rows. Nobody asked for it." },
+    { t: 29, end: 36, scene: "gap", action: "columns",
+      caption: "Intended: no. Configured: yes. Observed: unknown." },
+    { t: 36, end: 43, scene: "gap", action: "attempt-vs-complete",
+      caption: "Attempted is not completed. The record shows no completion, so it stays unknown." },
+    { t: 43, end: 49, scene: "intervene", action: "finding",
+      caption: "Severity, confidence and outcome are separate answers. Here: Critical, Medium, unknown." },
+    { t: 49, end: 55, scene: "proof", action: "drawer",
+      caption: "Every claim points to a record: task, tool grant, attempted call." },
+    { t: 55, end: 60, scene: "proof", action: "unknowns",
+      caption: "Open questions are listed as open. Nothing is invented." },
+    { t: 60, end: 65, scene: "intervene", action: "enforce",
+      caption: "Concept simulation: a policy gate could hold the export for approval. Not live." },
     { t: 65, end: 70, scene: "end", action: "end",
-      caption: "What did your AI agent do when nobody was watching? See the gap." }
+      caption: "Mimo: what can you actually prove about your agent's authority?" }
   ];
 
-  return { request: request, tickets: tickets, summary: summary, tools: tools,
+  return { hook: hook, request: request, tickets: tickets, summary: summary, tools: tools,
            trace: trace, syntheticCustomerRows: syntheticCustomerRows,
            scenes: scenes, walkthrough: walkthrough };
 });

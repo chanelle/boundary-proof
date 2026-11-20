@@ -86,12 +86,17 @@ class DemoE2E(unittest.TestCase):
         pg = self.page()
         pg.goto(self.base + "/index.html")
         pg.click("#primary-cta")
-        pg.wait_for_selector(".scene[data-scene=request].active")
-        for _ in range(4):
+        pg.wait_for_selector(".scene[data-scene=hook].active")
+        pg.wait_for_selector("#hook-lines li:nth-child(4).show")
+        self.assertIn("We don't know", pg.inner_text("#hook-lines"))
+        for _ in range(5):
             pg.click("#next")
         self.assertTrue(pg.is_visible(".scene[data-scene=intervene].active"))
         self.assertIn("ENGINE OUTPUT", pg.inner_text("#finding-card"))
         self.assertIn("U-attempt-send_external", pg.inner_text("#finding-card"))
+        triad = pg.inner_text("#triad").upper()
+        for k in ("RISK SEVERITY", "EVIDENCE CONFIDENCE", "ACTION OUTCOME", "COMPLETION UNKNOWN", "NOT DETECTED LIVE"):
+            self.assertIn(k, triad)
         pg.click("[data-mode=enforce]")
         self.assertIn("CONCEPT SIMULATION", pg.inner_text("[data-pane=enforce]").upper())
         self.assertIn("DENY PENDING APPROVAL", pg.inner_text("#gate-trace"))
@@ -106,14 +111,17 @@ class DemoE2E(unittest.TestCase):
         self.assertIn("Know what your AI agents are actually allowed to do.", pg.inner_text("#h-end"))
         pg.click("#end-pilot-cta")
         pg.wait_for_url("**/pilot.html*")
-        pg.fill("input[name=email]", "lead@corp.example")
-        pg.select_option("select[name=role]", "security")
-        pg.select_option("select[name=agents]", "production")
-        pg.click("form button[type=submit]")
-        names = [e["event"] for e in self.events(pg)]
-        for n in ["landing_view", "demo_start", "evidence_open", "demo_complete", "pilot_cta_click", "qualified_request"]:
+        self.assertEqual(pg.get_attribute("#book-cta", "href"), "https://cal.com/chanelleh")
+        self.assertEqual(pg.get_attribute("#book-cta", "target"), "_blank")
+        self.assertIn("Nothing is booked until you confirm", pg.inner_text("#request"))
+        pg.evaluate("document.getElementById('book-cta').removeAttribute('href')")  # stay offline in tests
+        pg.click("#book-cta")
+        events = self.events(pg)
+        names = [e["event"] for e in events]
+        for n in ["landing_view", "demo_start", "evidence_open", "demo_complete", "pilot_cta_click"]:
             self.assertIn(n, names)
-        self.assertNotIn("lead@corp.example", pg.evaluate("localStorage.getItem('mimo.events.v1')"))
+        self.assertNotIn("qualified_request", names)  # only an operator can log that
+        self.assertTrue(any(e["props"].get("handoff") == "calcom" for e in events))
         self.assertEqual(pg.external, []); self.assertEqual(pg.errors, [])
 
     def test_attempt_vs_completion_visible(self):
@@ -131,7 +139,7 @@ class DemoE2E(unittest.TestCase):
     def test_mobile_has_no_horizontal_overflow(self):
         pg = self.page(width=360)
         for url in ["index.html", "pilot.html"] + [f"demo.html#{s}" for s in
-                    ["request", "tools", "attempt", "gap", "intervene", "proof", "end"]]:
+                    ["hook", "request", "tools", "attempt", "gap", "intervene", "proof", "end"]]:
             pg.goto(self.base + "/" + url)
             pg.wait_for_timeout(150)
             over = pg.evaluate("""() => [...document.querySelectorAll('main *, header *')]

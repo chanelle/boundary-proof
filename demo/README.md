@@ -3,6 +3,8 @@
 Interactive concept demo built on the BoundaryProof engine in this repository.
 Synthetic data only. Mimo is a provisional name pending naming clearance.
 
+**Positioning:** Mimo answers *what can you actually prove about your AI agent's authority and behavior?* It separates authority, capability, attempts, completed actions and unresolved questions, and ties each to a record. It works from a supplied evidence dossier; it does not monitor or block agents live.
+
 ## Run it locally
 
 No build step, no dependencies, no network calls.
@@ -32,14 +34,14 @@ Keyboard: ← → move between scenes, Esc closes the evidence drawer.
 ```bash
 python3 demo/build_demo_data.py          # runs the real engine on fixtures/f09_permission_nobody_gave.json
 node demo/tools/make_captions.js         # regenerates video/captions.vtt and video/transcript.md
-python3 demo/tools/record_walkthrough.py # records video/out/walkthrough.{webm,mp4} (needs Playwright + Chrome, ffmpeg)
+python3 demo/tools/record_walkthrough.py # records video/out/walkthrough-16x9.mp4 (1920x1080) and walkthrough-4x5.mp4 (1080x1350, phone layout)
 ```
 
 ## Tests
 
 ```bash
 python3 -m unittest discover -s tests    # 48 original + 7 attempted-action engine tests + 7 demo-data tests
-node --test demo/tests/*.test.js         # 21 unit tests: assignment, analytics, gate, scenario/engine agreement, copy
+node --test demo/tests/*.test.js         # 22 unit tests: assignment, analytics, gate, scenario/engine agreement, copy
 python3 demo/tests/test_e2e.py           # 5 browser tests (skips if Playwright/Chrome missing)
 ```
 
@@ -53,7 +55,8 @@ python3 demo/tests/test_e2e.py           # 5 browser tests (skips if Playwright/
 | "Did the export complete?" | **Engine unknown** `U-attempt-send_external`, raised because the observation carries `attempted: true` with `result: UNKNOWN` | `ENGINE · U-ATTEMPT-SEND_EXTERNAL` |
 | Policy gate (deny, request approval) | `MimoCore.policyGate`, a pure function replaying the synthetic trace against the engine's intended column. Connected to nothing | `CONCEPT SIMULATION · NOT LIVE ENFORCEMENT` (dashed frame) |
 | Analytics | Mock adapter writing to `localStorage`. No transport exists in code (a test enforces this) | `?debug=1` panel |
-| Pilot request form | No backend. Stores only role category, deployment stage, and a corporate-domain yes/no; never the email | On-page notice |
+| Pilot booking | Real handoff: a link to cal.com/chanelleh (30-minute slot) in a new tab. The page records only that the link was clicked; nothing is booked until the visitor confirms on Cal.com. `qualified_request` is logged by the operator from `?debug=1` after a real booking | On-page notice |
+| Finding outcome | "Attempted, completion UNKNOWN" comes from the evidence dossier (synthetic trace TC-7782 / EV-05), not from Mimo observing anything | "From the evidence dossier … not detected live" |
 
 ## Files
 
@@ -67,7 +70,7 @@ demo/
   js/engine-data.js        GENERATED from the engine
   js/demo.js  js/ui-common.js
   data/engine_output.json  GENERATED from the engine
-  docs/                    storyboard, pilot one-pager, limitations + validation checklist
+  docs/                    storyboard, pilot one-pager, outreach kit, limitations + validation checklist
   video/                   captions.vtt, transcript.md (recordings go to video/out/, git-ignored)
   tools/  tests/
 ```

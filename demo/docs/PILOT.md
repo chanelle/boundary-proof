@@ -27,4 +27,6 @@
 
 **What it is not.** Not runtime enforcement, monitoring, a scanner, or an IAM replacement. The engine reasons over described and recorded agent behavior; it does not probe live agents. Enforcement appears in the demo only as a labeled concept simulation.
 
-**Next step.** Would a 20-minute walkthrough of your agent workflow be useful?
+**Positioning.** Mimo answers: what can you actually prove about your agent's authority and behavior? It separates authority, capability, attempts, completed actions and open questions, each tied to a record.
+
+**Next step.** Would a 20-minute walkthrough of your agent workflow be useful? Book at https://cal.com/chanelleh (30-minute slot; nothing is booked until you confirm there).

@@ -183,6 +183,15 @@ test("walkthrough runs 70 seconds, contiguous, inside known scenes", () => {
   assert.ok(w.some(s => /simulation/i.test(s.caption)), "enforcement caption must say simulation");
 });
 
+test("hook: four lines, each tied to a record, ending on the unknown", () => {
+  assert.equal(S.hook.length, 4);
+  S.hook.forEach(h => assert.ok(h.ref.length > 0));
+  assert.match(S.hook[3].text, /don't know/);
+  assert.equal(S.walkthrough.filter(w => w.scene === "hook").at(-1).end, 15);
+  assert.ok(S.hook[3].ref.includes("U-attempt-send_external"));
+  assert.ok(engine.unknowns.some(u => u.id === S.hook[3].ref));
+});
+
 // ---------- A/B copy ----------
 test("variants differ only in headline, subhead, primary CTA and angle", () => {
   const a = Copy.forVariant("A"), b = Copy.forVariant("B");

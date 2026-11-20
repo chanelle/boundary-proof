@@ -9,7 +9,8 @@
 5. **Verbs are not resource-scoped.** `read` covers tickets and customer records alike. The intent limits (`read_scope: support tickets only`) are carried as text and not evaluated.
 6. **`customers.export` → `send_external` is a modeling choice.** An export to internal storage would map to `read` + `write` and produce a different finding. The fixture states the destination is external.
 7. **Severity is Critical, confidence Medium, on configuration alone.** That is the engine's real output given `customer_data_in_reach: true` and no compensating control. Expect a buyer to ask why Critical without observed exfiltration. The honest answer: severity ranks business consequence; confidence carries the evidence strength.
-8. **Analytics are local only.** Events live in one browser's `localStorage`. There is no aggregation across visitors. A real test needs a reviewed adapter, a consent/analytics disclosure, and a backend for the request form.
+8. **Analytics are local only, and nothing is hosted.** Events live in one browser's `localStorage`; there is no aggregation across visitors. Booking now hands off to Cal.com, but bookings are not linked back to a variant, so the A/B conversion metric needs a hosted page, a reviewed analytics adapter, a consent disclosure, and a way to tag Cal.com bookings by variant (for example a separate event type or a UTM-style note).
+12. **Booking slot is 30 minutes.** cal.com/chanelleh offers one 30-minute event; the pitch says "20-minute walkthrough". The page states both honestly. A dedicated 20-minute event type would remove the mismatch.
 9. **Bot and self-traffic exclusion is heuristic.** User-agent matching, `navigator.webdriver`, a sticky `?internal=1` flag, forced variants, and autoplay recordings are excluded. Sophisticated bots will get through.
 10. **Five buyer conversations cannot pick an A/B winner.** Treat them as qualitative discovery. The randomized landing test needs real traffic volume before conversion numbers mean anything.
 11. **Name not cleared.** "Mimo" is provisional; no trademark, domain, or handle check has been done.
@@ -26,7 +27,7 @@
 ### Automated (run before every showing)
 
 - [ ] `python3 -m unittest discover -s tests` → 62 pass (48 original + 7 attempted-action + 7 demo data)
-- [ ] `node --test demo/tests/*.test.js` → 21 pass
+- [ ] `node --test demo/tests/*.test.js` → 22 pass
 - [ ] `python3 demo/tests/test_e2e.py` → 5 pass (variants share DOM; stable assignment; full funnel events; simulation labels; no external requests; no console errors; no horizontal overflow at 360 px)
 - [ ] `python3 demo/build_demo_data.py && git diff --exit-code demo/data` → no drift
 
@@ -45,6 +46,6 @@
 
 - [ ] Naming clearance gate passed (or brand removed)
 - [ ] Analytics disclosure written and an adapter chosen and reviewed
-- [ ] Request form wired to a channel you will actually read, with the same no-email-in-analytics rule
+- [ ] Cal.com link opens and shows open slots; decide whether to add a 20-minute "Mimo discovery" event type
 - [ ] Decide whether to keep "Critical" visible or explain severity vs confidence up front
 - [ ] Rehearse the limitations above out loud

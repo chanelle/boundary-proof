@@ -3,46 +3,54 @@ WEBVTT
 NOTE Generated from demo/js/scenario.js (walkthrough). Synthetic data; enforcement is a concept simulation.
 
 1
-00:00:00.000 --> 00:00:08.000
-Your AI assistant was asked for a simple summary.
+00:00:00.000 --> 00:00:03.000
+You asked your AI agent for a summary.
 
 2
-00:00:08.000 --> 00:00:13.000
-It reads twelve synthetic support tickets...
+00:00:03.000 --> 00:00:06.000
+It had permission to export customer records.
 
 3
-00:00:13.000 --> 00:00:18.000
-...and writes a useful five-theme summary.
+00:00:06.000 --> 00:00:09.000
+It attempted an export.
 
 4
-00:00:18.000 --> 00:00:24.000
-Then one more tool call: customers.export, 2,400 rows.
+00:00:09.000 --> 00:00:15.000
+Did it complete? We don't know. And that uncertainty matters.
 
 5
-00:00:24.000 --> 00:00:30.000
-Nobody asked it to do that.
+00:00:15.000 --> 00:00:22.000
+The request: summarize this week's complaints. The agent reads 12 synthetic tickets.
 
 6
-00:00:30.000 --> 00:00:38.000
-Intended. Configured. Observed. Three columns that should agree.
+00:00:22.000 --> 00:00:29.000
+In between, one more call: customers.export, 2,400 rows. Nobody asked for it.
 
 7
-00:00:38.000 --> 00:00:45.000
-It was attempted. Whether it completed is unknown, and stays unknown.
+00:00:29.000 --> 00:00:36.000
+Intended: no. Configured: yes. Observed: unknown.
 
 8
-00:00:45.000 --> 00:00:51.000
-The evidence: task scope, tool grant, the attempted call, provenance.
+00:00:36.000 --> 00:00:43.000
+Attempted is not completed. The record shows no completion, so it stays unknown.
 
 9
-00:00:51.000 --> 00:00:57.000
-Gaps in evidence are listed as gaps. Nothing is invented.
+00:00:43.000 --> 00:00:49.000
+Severity, confidence and outcome are separate answers. Here: Critical, Medium, unknown.
 
 10
-00:00:57.000 --> 00:01:05.000
-Concept simulation: a policy gate holds the export for human approval.
+00:00:49.000 --> 00:00:55.000
+Every claim points to a record: task, tool grant, attempted call.
 
 11
+00:00:55.000 --> 00:01:00.000
+Open questions are listed as open. Nothing is invented.
+
+12
+00:01:00.000 --> 00:01:05.000
+Concept simulation: a policy gate could hold the export for approval. Not live.
+
+13
 00:01:05.000 --> 00:01:10.000
-What did your AI agent do when nobody was watching? See the gap.
+Mimo: what can you actually prove about your agent's authority?
 
