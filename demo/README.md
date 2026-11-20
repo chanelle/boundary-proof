@@ -42,7 +42,12 @@ python3 demo/tools/record_walkthrough.py # records video/out/walkthrough-16x9.mp
 ```bash
 python3 demo/tools/build_site.py     # -> demo/dist/mimo/ (adds Simple Analytics + adapter; local demo stays offline)
 bash deploy/deploy_mimo.sh           # you run it: hidden cPanel token prompt, read-only check, plan, type "yes"
+bash deploy/validate_mimo.sh         # read-only live checks after a deploy (--pre before the first one)
 ```
+
+Preferred route: the manual-only GitHub Actions workflow in chanellehenry-site
+(https://github.com/chanelle/chanellehenry-site/actions/workflows/deploy-mimo.yml), which reuses the existing
+`CPANEL_TOKEN` secret, defaults to a dry run, and needs a typed confirmation to upload. Steps: `deploy/CHECKLIST.md`.
 
 The deploy touches only `/home/chanpdrb/becomingbeta.com/mimo/`, creates its folders, uploads 19 files, then checks every key file live (HTTP 200 + checksum) and that the existing home page still serves. It refuses to run if `/mimo` exists unless you pass `--update`. Tested end to end against a mock cPanel; not yet run against the real server.
 
