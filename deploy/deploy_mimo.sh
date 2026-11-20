@@ -8,6 +8,10 @@
 #         bash deploy/deploy_mimo.sh             # first deploy (stops if /mimo exists)
 #         bash deploy/deploy_mimo.sh --update    # overwrite files in an existing /mimo
 #
+# CI (GitHub Actions, manual only): CPANEL_TOKEN from the repo secret and
+#   MIMO_NONINTERACTIVE=1 skip the prompts; MIMO_DRY_RUN=1 stops after the
+#   read-only check and the plan, so nothing is created or uploaded.
+#
 # Touches ONLY /home/chanpdrb/becomingbeta.com/mimo/. Nothing is deleted anywhere.
 # To take it down: cPanel > File Manager > becomingbeta.com > delete (or rename) the mimo folder.
 set -uo pipefail
@@ -24,7 +28,12 @@ UPDATE=0; [ "${1:-}" = "--update" ] && UPDATE=1
 [ -f "$DIST/index.html" ] || { echo "No $DIST/index.html. Run: python3 demo/tools/build_site.py"; exit 1; }
 md5of() { if command -v md5 >/dev/null; then md5 -q "$@"; else md5sum "$@" | cut -d' ' -f1; fi; }
 
-read -rsp "Paste cPanel API token (hidden): " CPANEL_TOKEN; echo
+DRY=${MIMO_DRY_RUN:-0}
+if [ "${MIMO_NONINTERACTIVE:-0}" = "1" ]; then
+  [ -n "${CPANEL_TOKEN:-}" ] || { echo "CPANEL_TOKEN is not set."; exit 1; }
+else
+  read -rsp "Paste cPanel API token (hidden): " CPANEL_TOKEN; echo
+fi
 case "$CPANEL_TOKEN" in *[[:space:]]*|"") echo "Token is empty or has a space/line break. Re-copy it as one string."; exit 1;; esac
 trap 'unset CPANEL_TOKEN; echo "Token cleared from this shell."' EXIT
 
@@ -73,7 +82,12 @@ DIRS=$(printf '%s\n' $FILES | xargs -n1 dirname | grep -v '^\.$' | sort -u)
 echo "   create  $TARGET/ and: $(echo $DIRS)"
 for f in $FILES; do echo "   upload  $f  ->  $TARGET/$f"; done
 echo "   Nothing outside $TARGET is touched. Nothing is deleted."
-read -rp "Type yes to deploy: " OK; [ "$OK" = "yes" ] || { echo "Cancelled. Nothing uploaded."; exit 0; }
+if [ "$DRY" = "1" ]; then echo "DRY RUN: stopping here. Nothing was created or uploaded."; exit 0; fi
+if [ "${MIMO_NONINTERACTIVE:-0}" = "1" ]; then
+  echo "   Non-interactive run (manual GitHub Actions dispatch with confirmation)."
+else
+  read -rp "Type yes to deploy: " OK; [ "$OK" = "yes" ] || { echo "Cancelled. Nothing uploaded."; exit 0; }
+fi
 
 echo "3) Folders"
 mkdir_api2 "$SITE_ROOT" mimo || fail "mkdir mimo"
@@ -100,4 +114,4 @@ code=$(curl -s -o /dev/null -w '%{http_code}' "$DOMAIN/mimo/")
 echo "   /mimo/ (directory index)  HTTP $code"
 code=$(curl -s -o /dev/null -w '%{http_code}' "$DOMAIN/"); echo "   existing site $DOMAIN/  HTTP $code"
 curl -sS "$DOMAIN/" | grep -q "Why Beta" && echo "   existing home page marker found" || { echo "   existing home page marker NOT found: check the site"; BAD=1; }
-[ $BAD -eq 0 ] && echo "Done: $DOMAIN/mimo/" || echo "Finished with problems above."
+[ $BAD -eq 0 ] && echo "Done: $DOMAIN/mimo/" || { echo "Finished with problems above."; exit 1; }
