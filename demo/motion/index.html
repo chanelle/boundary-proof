@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mimo · 50-second product film (synthetic data)</title>
+<meta name="robots" content="noindex">
+<!--
+  Motion piece in the grammar of a SaaS launch film: kinetic type, floating UI
+  in perspective, camera push-ins, a cursor beat, a dark-to-light "check"
+  section, a three-beat benefit line and a logo outro. Palette stays Redacted
+  (no glows, no purple gradients, no bouncy easing).
+
+  Deterministic: the whole frame is a pure function of time. window.seek(t)
+  renders time t in seconds; demo/tools/render_motion.py steps it at 30 fps.
+  Opening the page plays it in real time. ?t=12.5 freezes on one frame.
+  Every number and id on screen comes from the synthetic scenario and the
+  real BoundaryProof engine output for it.
+-->
+<style>
+@font-face { font-family: "Fraunces"; src: url(../fonts/fraunces-opsz.woff2) format("woff2-variations"); font-weight: 100 900; font-style: normal; }
+@font-face { font-family: "Fraunces"; src: url(../fonts/fraunces-opsz-italic.woff2) format("woff2-variations"); font-weight: 100 900; font-style: italic; }
+@font-face { font-family: "Plex Mono"; src: url(../fonts/plex-mono-400.woff2) format("woff2"); font-weight: 400; }
+@font-face { font-family: "Plex Mono"; src: url(../fonts/plex-mono-500.woff2) format("woff2"); font-weight: 500; }
+@font-face { font-family: "Plex Mono"; src: url(../fonts/plex-mono-600.woff2) format("woff2"); font-weight: 600; }
+:root {
+  --bg: #0E0F0D; --bg2: #151714; --text: #E8ECEF; --muted: #878D91; --line: #2A2D2A;
+  --accent: #A9D44D; --alert: #FF5A4E; --paper: #E8ECEF; --ink: #0E0F0D; --paper-line: #C9CFD3;
+  --serif: "Fraunces", Georgia, serif; --mono: "Plex Mono", ui-monospace, monospace;
+  /* stage unit: 1u = 1/100 of the shorter stage side, so 16:9 and 4:5 share one layout */
+  --u: min(1.05vw, 1.45vh);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
+body { color: var(--text); font-family: var(--serif); -webkit-font-smoothing: antialiased; font-variation-settings: "opsz" 144; }
+#stage { position: fixed; inset: 0; overflow: hidden; perspective: calc(240 * var(--u)); }
+#paper { position: absolute; inset: 0; background: var(--paper); }
+#grain { position: absolute; inset: 0; pointer-events: none; opacity: .035; z-index: 50;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+#grid { position: absolute; inset: -10%; z-index: 0; opacity: .5;
+  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: calc(8 * var(--u)) calc(8 * var(--u)); }
+.scene { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(3 * var(--u)); transform-style: preserve-3d; }
+.k { will-change: transform, opacity, filter; transform-style: preserve-3d; }
+.big { font-weight: 500; letter-spacing: -.03em; line-height: 1.02; text-align: center; font-size: calc(9 * var(--u)); max-width: 92vw; }
+.mid { font-weight: 500; letter-spacing: -.025em; line-height: 1.05; text-align: center; font-size: calc(6.4 * var(--u)); max-width: 90vw; }
+.mono { font-family: var(--mono); letter-spacing: .12em; text-transform: uppercase; font-size: calc(1.6 * var(--u)); }
+.alert { color: var(--alert); } .accent { color: var(--accent); } .muted { color: var(--muted); }
+.caret { display: inline-block; width: calc(.5 * var(--u)); height: .82em; background: var(--accent); vertical-align: -.06em; margin-left: .06em; }
+em.unk { font-style: italic; color: var(--muted); text-decoration: underline dashed var(--alert); text-decoration-thickness: calc(.35 * var(--u)); text-underline-offset: .14em; }
+.card { background: var(--bg2); border: calc(.18 * var(--u)) solid var(--line); border-radius: calc(.6 * var(--u)); padding: calc(2.2 * var(--u)) calc(2.6 * var(--u)); }
+.paper .card { background: #fff; border-color: var(--paper-line); color: var(--ink); }
+.row { display: flex; gap: calc(2 * var(--u)); align-items: stretch; justify-content: center; flex-wrap: wrap; }
+.tool { width: calc(30 * var(--u)); }
+.tool .n { font-family: var(--mono); font-size: calc(2.6 * var(--u)); }
+.tool .d { color: var(--muted); font-size: calc(1.9 * var(--u)); margin: calc(1 * var(--u)) 0 calc(1.6 * var(--u)); }
+.pill { display: inline-block; font-family: var(--mono); font-size: calc(1.5 * var(--u)); letter-spacing: .12em; text-transform: uppercase; padding: calc(.5 * var(--u)) calc(1 * var(--u)); border-radius: calc(.5 * var(--u)); border: calc(.15 * var(--u)) solid currentColor; margin-right: calc(.6 * var(--u)); }
+.pill.fill { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+.tool.out { border-color: var(--alert); } .tool.out .n { color: var(--alert); }
+.trace { width: min(86vw, calc(120 * var(--u))); font-family: var(--mono); font-size: calc(2.3 * var(--u)); padding: 0; }
+.trace .l { display: grid; grid-template-columns: 7em 6em 1fr auto; gap: 1.2em; padding: calc(1.6 * var(--u)) calc(2.4 * var(--u)); border-bottom: calc(.15 * var(--u)) solid var(--line); align-items: center; }
+.trace .l:last-child { border-bottom: 0; }
+.trace .t, .trace .i { color: var(--muted); }
+.trace .st { font-size: .7em; letter-spacing: .1em; padding: .3em .6em; border: calc(.15 * var(--u)) solid var(--line); border-radius: .3em; color: var(--muted); }
+.trace .l.hot { background: rgba(255,90,78,.08); } .trace .l.hot .c { color: var(--alert); }
+.trace .l.hot .st { color: var(--alert); border-color: var(--alert); border-style: dashed; }
+.wordmark { font-weight: 600; letter-spacing: -.03em; font-size: calc(16 * var(--u)); line-height: 1; }
+.wordmark .dot { color: var(--accent); display: inline-block; }
+.col { width: calc(30 * var(--u)); text-align: left; }
+.col h4 { margin: 0; font-family: var(--mono); font-weight: 500; letter-spacing: .14em; font-size: calc(1.8 * var(--u)); }
+.col .q { color: #5F666A; font-size: calc(1.8 * var(--u)); margin: calc(.6 * var(--u)) 0 calc(2 * var(--u)); }
+.col .v { font-family: var(--mono); font-size: calc(4.6 * var(--u)); font-weight: 600; letter-spacing: .04em; }
+.col .src { font-family: var(--mono); font-size: calc(1.3 * var(--u)); color: #5F666A; margin-top: calc(1.4 * var(--u)); letter-spacing: .06em; }
+.col.hot { border-color: var(--alert) !important; } .col.hot .v { color: var(--alert); }
+.col.unk { border-style: dashed !important; border-color: var(--alert) !important; background: repeating-linear-gradient(135deg, #fff 0 calc(.9*var(--u)), #FBEDEC calc(.9*var(--u)) calc(1*var(--u))) !important; }
+.col.unk .v { color: #5F666A; }
+.gap { font-family: var(--mono); font-weight: 600; letter-spacing: .16em; font-size: calc(2.2 * var(--u)); color: #fff; background: var(--alert); padding: calc(1 * var(--u)) calc(1.8 * var(--u)); border-radius: calc(.5 * var(--u)); }
+.ev { width: min(86vw, calc(84 * var(--u))); position: relative; }
+.ev .li { display: grid; grid-template-columns: 5.5em 1fr; gap: 1em; font-size: calc(2.4 * var(--u)); padding: calc(1.3 * var(--u)) 0; border-bottom: calc(.15 * var(--u)) solid var(--line); }
+.ev .li:last-child { border-bottom: 0; }
+.ev .id { font-family: var(--mono); color: var(--accent); }
+.ev .s { font-family: var(--mono); font-size: .62em; color: var(--muted); margin-top: .3em; letter-spacing: .04em; }
+.bracket { position: absolute; width: calc(5 * var(--u)); height: calc(5 * var(--u)); border: calc(.45 * var(--u)) solid var(--accent); }
+.bracket.tl { left: calc(-1.4 * var(--u)); top: calc(-1.4 * var(--u)); border-right: 0; border-bottom: 0; }
+.bracket.tr { right: calc(-1.4 * var(--u)); top: calc(-1.4 * var(--u)); border-left: 0; border-bottom: 0; }
+.bracket.bl { left: calc(-1.4 * var(--u)); bottom: calc(-1.4 * var(--u)); border-right: 0; border-top: 0; }
+.bracket.br { right: calc(-1.4 * var(--u)); bottom: calc(-1.4 * var(--u)); border-left: 0; border-top: 0; }
+.scan { position: absolute; left: 0; right: 0; height: calc(.3 * var(--u)); background: var(--accent); opacity: .7; }
+.tile { width: calc(30 * var(--u)); }
+.tile .k2 { font-family: var(--mono); font-size: calc(1.5 * var(--u)); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.tile .v2 { font-size: calc(4.4 * var(--u)); line-height: 1.05; margin-top: calc(1 * var(--u)); }
+.tile .s2 { font-family: var(--mono); font-size: calc(1.3 * var(--u)); color: var(--muted); margin-top: calc(1.2 * var(--u)); letter-spacing: .05em; }
+.tile.unk { border-style: dashed; border-color: var(--alert); background: repeating-linear-gradient(135deg, var(--bg2) 0 calc(.9*var(--u)), #1E1714 calc(.9*var(--u)) calc(1*var(--u))); }
+.gatecard { width: min(86vw, calc(88 * var(--u))); border-style: dashed; border-color: var(--muted); }
+.gatecard .q3 { font-size: calc(3.4 * var(--u)); line-height: 1.2; margin: calc(1.6 * var(--u)) 0 calc(2.6 * var(--u)); }
+.btn { display: inline-block; font-family: var(--mono); font-size: calc(1.9 * var(--u)); letter-spacing: .12em; text-transform: uppercase; padding: calc(1.4 * var(--u)) calc(2.2 * var(--u)); border-radius: calc(.5 * var(--u)); border: calc(.18 * var(--u)) solid var(--line); margin-right: calc(1.2 * var(--u)); color: var(--text); }
+.btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+.simtag { font-family: var(--mono); font-size: calc(1.4 * var(--u)); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); border: calc(.15 * var(--u)) dashed var(--muted); padding: calc(.5 * var(--u)) calc(.9 * var(--u)); border-radius: calc(.4 * var(--u)); display: inline-block; }
+.cursor { position: absolute; width: calc(3.2 * var(--u)); height: calc(3.2 * var(--u)); z-index: 40; }
+.ring { width: calc(22 * var(--u)); height: calc(22 * var(--u)); }
+.endpill { font-family: var(--mono); font-size: calc(2 * var(--u)); letter-spacing: .1em; background: var(--ink); color: var(--paper); padding: calc(1.2 * var(--u)) calc(2.2 * var(--u)); border-radius: calc(5 * var(--u)); }
+.foot { position: absolute; left: 0; right: 0; bottom: calc(4 * var(--u)); text-align: center; }
+.corner { position: absolute; left: calc(4 * var(--u)); top: calc(4 * var(--u)); font-family: var(--serif); font-weight: 600; font-size: calc(3 * var(--u)); letter-spacing: -.02em; }
+.corner .dot { color: var(--accent); }
+.badge { position: absolute; right: calc(4 * var(--u)); top: calc(4.4 * var(--u)); }
+/* portrait (4:5) tweaks */
+@media (max-aspect-ratio: 1/1) {
+  .row.cols { flex-direction: column; align-items: center; gap: calc(1.6 * var(--u)); }
+  .col, .tile, .tool { width: calc(78 * var(--u)); }
+  .col .v, .tile .v2 { font-size: calc(5 * var(--u)); }
+  .col .q { margin-bottom: calc(1 * var(--u)); }
+  .trace .l { grid-template-columns: 1fr auto; } .trace .i { display: none; } .trace .t { display: none; }
+}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="paper" class="k" data-k="paper"></div>
+  <div id="grid" class="k" data-k="grid"></div>
+  <div class="corner k" data-k="corner">mimo<span class="dot">.</span></div>
+  <div class="badge k mono muted" data-k="badge">Synthetic scenario</div>
+
+  <!-- S1 0-5: the ask -->
+  <section class="scene k" data-k="s1">
+    <div class="big k" data-k="s1a"><span data-type="s1a">You asked your AI agent</span><span class="caret k" data-k="caret1"></span></div>
+    <div class="big k accent" data-k="s1b"><em style="font-style:italic;font-weight:400" data-type="s1b">for a summary.</em></div>
+  </section>
+
+  <!-- S2 5-10: the grant -->
+  <section class="scene k" data-k="s2">
+    <div class="mid k" data-k="s2a">It had permission to <span class="alert">export customer records.</span></div>
+    <div class="row k" data-k="s2row">
+      <div class="card tool k" data-k="t1"><div class="n">tickets.read</div><div class="d">Read support tickets</div><span class="pill accent">In task</span></div>
+      <div class="card tool k" data-k="t2"><div class="n">summaries.write</div><div class="d">Save a summary</div><span class="pill accent">In task</span></div>
+      <div class="card tool out k" data-k="t3"><div class="n">customers.export</div><div class="d">Export rows to an external destination</div><span class="pill alert">Not in task</span></div>
+    </div>
+  </section>
+
+  <!-- S3 10-15: the attempt -->
+  <section class="scene k" data-k="s3">
+    <div class="card trace k" data-k="trace">
+      <div class="l k" data-k="l1"><span class="t">14:02:19</span><span class="i">TC-7781</span><span class="c">tickets.read(queue: "support")</span><span class="st">completed</span></div>
+      <div class="l k" data-k="l2"><span class="t">14:02:27</span><span class="i">TC-7782</span><span class="c">customers.export(rows: 2400)</span><span class="st">completion unknown</span></div>
+      <div class="l k" data-k="l3"><span class="t">14:02:41</span><span class="i">TC-7783</span><span class="c">summaries.write(themes: 5)</span><span class="st">completed</span></div>
+    </div>
+    <div class="mid alert k" data-k="s3a">It attempted an export.</div>
+  </section>
+
+  <!-- S4 15-19: the unknown -->
+  <section class="scene k" data-k="s4">
+    <div class="big k" data-k="s4a">Did it complete?</div>
+    <div class="big k" data-k="s4b"><em class="unk">We don't know.</em></div>
+    <div class="mono muted k" data-k="s4c">The trace records the request. No response. No receipt.</div>
+  </section>
+
+  <!-- S5 19-23: meet -->
+  <section class="scene k" data-k="s5">
+    <div class="mid muted k" data-k="s5a">Meet</div>
+    <div class="wordmark k" data-k="s5b">mimo<span class="dot k" data-k="s5dot">.</span></div>
+    <div class="k" data-k="s5c"><span class="pill fill">What can you actually prove?</span></div>
+  </section>
+
+  <!-- S6 23-26: quick check (light) -->
+  <section class="scene k" data-k="s6" style="color:var(--ink)">
+    <div class="mid k" data-k="s6a"><span data-type="s6a">Time for a quick check</span></div>
+  </section>
+
+  <!-- S7 26-33: three columns (light) -->
+  <section class="scene paper k" data-k="s7" style="color:var(--ink)">
+    <div class="row cols k" data-k="s7row">
+      <div class="card col k" data-k="c1"><h4>INTENDED</h4><div class="q">What the user authorized</div><div class="v">NO</div><div class="src">EV-01 · REQ-0412</div></div>
+      <div class="card col hot k" data-k="c2"><h4>CONFIGURED</h4><div class="q">What the tools permit</div><div class="v">YES</div><div class="src">EV-02 · mock-tool-policy.json</div></div>
+      <div class="card col unk k" data-k="c3"><h4>OBSERVED</h4><div class="q">What the evidence establishes</div><div class="v">UNKNOWN</div><div class="src">EV-05 · TC-7782</div></div>
+    </div>
+    <div class="k" data-k="s7gap"><span class="gap">AUTHORITY GAP · send_external</span></div>
+  </section>
+
+  <!-- S8 33-40: evidence + three answers (dark) -->
+  <section class="scene k" data-k="s8">
+    <div class="card ev k" data-k="ev">
+      <span class="bracket tl"></span><span class="bracket tr"></span><span class="bracket bl"></span><span class="bracket br"></span>
+      <div class="scan k" data-k="scan"></div>
+      <div class="li"><span class="id">EV-01</span><div>Task scope: summarize five complaints. No export requested.<div class="s">document · user request REQ-0412</div></div></div>
+      <div class="li"><span class="id">EV-02</span><div>Tool policy grants customers.export.<div class="s">config · mock-tool-policy.json</div></div></div>
+      <div class="li"><span class="id">EV-05</span><div>customers.export requested, rows = 2400. No response recorded.<div class="s">log · trace TC-7782</div></div></div>
+    </div>
+  </section>
+  <section class="scene k" data-k="s8b">
+    <div class="row cols k" data-k="tiles">
+      <div class="card tile k" data-k="g1"><div class="k2">Risk severity</div><div class="v2">Critical</div><div class="s2">Engine · F-01</div></div>
+      <div class="card tile k" data-k="g2"><div class="k2">Evidence confidence</div><div class="v2">Medium</div><div class="s2">Engine · EV-01, EV-02, EV-05</div></div>
+      <div class="card tile unk k" data-k="g3"><div class="k2">Action outcome</div><div class="v2">Attempted.<br><span class="alert">Completion UNKNOWN.</span></div><div class="s2">From the dossier, not detected live</div></div>
+    </div>
+  </section>
+
+  <!-- S9 40-45: simulated gate + report -->
+  <section class="scene k" data-k="s9">
+    <div class="card gatecard k" data-k="gate">
+      <span class="simtag">Concept simulation · not live enforcement</span>
+      <div class="q3">support-summarizer-01 wants to export 2,400 customer rows. The request was a summary.</div>
+      <span class="btn primary k" data-k="holdbtn">Hold for approval</span><span class="btn">Allow once</span>
+    </div>
+    <svg class="cursor k" data-k="cursor" viewBox="0 0 24 24"><path d="M3 2 L3 20 L8 15 L11.5 22 L14.5 20.6 L11 13.8 L18 13.8 Z" fill="#E8ECEF" stroke="#0E0F0D" stroke-width="1.2" stroke-linejoin="round"/></svg>
+  </section>
+  <section class="scene k" data-k="s9b">
+    <svg class="ring k" data-k="ring" viewBox="0 0 100 100" aria-hidden="true">
+      <circle cx="50" cy="50" r="44" fill="none" stroke="#2A2D2A" stroke-width="4"/>
+      <circle class="k" data-k="ringarc" cx="50" cy="50" r="44" fill="none" stroke="#A9D44D" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="100" transform="rotate(-90 50 50)"/>
+      <path class="k" data-k="tick" d="M31 51 L45 64 L70 38" fill="none" stroke="#A9D44D" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" pathLength="100" stroke-dasharray="100"/>
+    </svg>
+    <div class="mid k" data-k="s9a">Evidence report ready.</div>
+    <div class="mono muted k" data-k="s9c">Real BoundaryProof engine output · synthetic scenario</div>
+  </section>
+
+  <!-- S10 45-49: benefits (light) -->
+  <section class="scene k" data-k="s10" style="color:var(--ink)">
+    <div class="big k" data-k="b1">See the gap.</div>
+    <div class="big k" data-k="b2">Keep the unknowns.</div>
+    <div class="big k" data-k="b3"><em style="font-weight:400">Prove it.</em></div>
+  </section>
+
+  <!-- S11 49-53: outro (light) -->
+  <section class="scene k" data-k="s11" style="color:var(--ink)">
+    <div class="wordmark k" data-k="o1">mimo<span class="dot">.</span></div>
+    <div class="k" data-k="o2"><span class="endpill">becomingbeta.com/mimo</span></div>
+    <div class="mono k" data-k="o3" style="color:#5F666A">Book a 30-minute Mimo discovery call</div>
+    <div class="foot mono k" data-k="o4" style="color:#5F666A;font-size:calc(1.2*var(--u))">Synthetic data · Powered by BoundaryProof · Mimo is a provisional name</div>
+  </section>
+
+  <div id="grain"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var DURATION = 53;
+  var E = {
+    lin: function (x) { return x; },
+    out: function (x) { return 1 - Math.pow(1 - x, 3); },          // calm decel, no overshoot
+    io: function (x) { return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; },
+    expo: function (x) { return x === 1 ? 1 : 1 - Math.pow(2, -10 * x); }
+  };
+  var el = {}; document.querySelectorAll("[data-k]").forEach(function (n) { el[n.getAttribute("data-k")] = n; });
+  var typed = {}; document.querySelectorAll("[data-type]").forEach(function (n) { typed[n.getAttribute("data-type")] = { n: n, full: n.textContent }; });
+
+  // Tween list: [key, t0, t1, from, to, ease]. Props: o, x, y, s, rx, ry, z, blur, dash (svg), bg (paper wipe %), cls (discrete).
+  var T = [];
+  function tw(k, t0, t1, from, to, ease) { T.push([k, t0, t1, from, to, ease || "out"]); }
+  function scene(k, a, b) { tw(k, a, a + .35, { o: 0 }, { o: 1 }, "io"); tw(k, b - .35, b, { o: 1 }, { o: 0 }, "io"); }
+  function rise(k, t, d, dy) { tw(k, t, t + (d || .7), { o: 0, y: dy == null ? 40 : dy, blur: 8 }, { o: 1, y: 0, blur: 0 }, "out"); }
+  var TYPE = []; function type(k, t0, t1) { TYPE.push([k, t0, t1]); }
+
+  // global
+  ["corner", "badge"].forEach(function (k) {
+    tw(k, 0, .6, { o: 0 }, { o: 1 });
+    tw(k, 22.6, 23.0, { o: 1 }, { o: 0 }, "io"); tw(k, 33.0, 33.5, { o: 0 }, { o: 1 }, "io");
+    tw(k, 44.6, 45.0, { o: 1 }, { o: 0 }, "io");
+  });
+  tw("grid", 0, 23, { o: .5, s: 1.0, y: 0 }, { o: .5, s: 1.12, y: -30 }, "lin");
+  tw("grid", 22.6, 23.2, { o: .5 }, { o: 0 }, "io");
+  // paper: dark -> light at 23, back to dark at 33, light again at 45
+  tw("paper", 0, .01, { o: 0 }, { o: 0 });
+  tw("paper", 22.7, 23.4, { o: 0, s: .02 }, { o: 1, s: 1 }, "expo");
+  tw("paper", 32.6, 33.2, { o: 1 }, { o: 0 }, "io");
+  tw("paper", 44.7, 45.4, { o: 0, s: .02 }, { o: 1, s: 1 }, "expo");
+
+  // S1 0-5
+  scene("s1", 0, 5.2);
+  type("s1a", .3, 2.1); tw("s1a", 0, .01, { o: 1 }, { o: 1 });
+  tw("caret1", 0, .01, { o: 1 }, { o: 1 }); tw("caret1", 2.4, 2.45, { o: 1 }, { o: 0 }, "lin");
+  rise("s1b", 2.4, .8);
+  tw("s1", 0, 5.2, { s: 1 }, { s: 1.06 }, "lin");
+
+  // S2 5-10: headline, then cards fly in tilted, camera pushes to the export card
+  scene("s2", 5, 10.2);
+  rise("s2a", 5.2, .7);
+  rise("t1", 5.9, .8, 120); rise("t2", 6.15, .8, 120); rise("t3", 6.4, .8, 120);
+  tw("s2row", 5.9, 7.4, { rx: 22, ry: -14 }, { rx: 8, ry: -6 }, "out");
+  var TALL = innerHeight > innerWidth;
+  tw("s2row", 7.6, 9.6, { rx: 8, ry: -6, s: 1, x: 0, y: 0 }, TALL ? { rx: 0, ry: 0, s: 1.12, x: 0, y: -130 } : { rx: 0, ry: 0, s: 1.22, x: -170, y: 0 }, "io");
+  tw("t1", 7.8, 8.6, { o: 1 }, { o: .35 }, "io"); tw("t2", 7.8, 8.6, { o: 1 }, { o: .35 }, "io");
+  tw("s2a", 7.6, 8.2, { o: 1 }, { o: 0 }, "io");
+
+  // S3 10-15: trace in 3D, lines appear, hot line, headline
+  scene("s3", 10, 15.2);
+  tw("trace", 10, 11.4, { rx: 26, ry: 10, s: .9, o: 0 }, { rx: 10, ry: 4, s: 1, o: 1 }, "out");
+  rise("l1", 10.4, .5, 20); rise("l2", 10.9, .5, 20); rise("l3", 11.4, .5, 20);
+  tw("l2", 12.2, 12.25, { cls: "" }, { cls: "hot" }, "lin");
+  tw("l1", 12.2, 12.8, { o: 1 }, { o: .4 }); tw("l3", 12.2, 12.8, { o: 1 }, { o: .4 });
+  tw("trace", 12.2, 14.6, { rx: 10, ry: 4, s: 1 }, { rx: 0, ry: 0, s: 1.12 }, "io");
+  rise("s3a", 12.8, .6, 30);
+
+  // S4 15-19
+  scene("s4", 15, 19.2);
+  rise("s4a", 15.2, .6); rise("s4b", 16.2, .7); rise("s4c", 17.1, .6, 16);
+  tw("s4", 15, 19.2, { s: 1 }, { s: 1.05 }, "lin");
+
+  // S5 19-23: Meet -> wordmark -> pill
+  scene("s5", 19, 23);
+  rise("s5a", 19.15, .5, 16); tw("s5a", 20.1, 20.5, { o: 1 }, { o: .0 }, "io");
+  tw("s5b", 20.2, 21.0, { o: 0, s: .86, blur: 10 }, { o: 1, s: 1, blur: 0 }, "out");
+  tw("s5dot", 20.8, 21.2, { o: 0, y: -60 }, { o: 1, y: 0 }, "out");
+  rise("s5c", 21.3, .6, 20);
+
+  // S6 23-26: light. typewriter
+  scene("s6", 23.2, 26);
+  type("s6a", 23.5, 24.9); tw("s6a", 23.2, 23.21, { o: 1 }, { o: 1 });
+
+  // S7 26-33: three columns in perspective, then gap pill
+  scene("s7", 26, 33);
+  tw("s7row", 26, 27.6, { rx: 30, ry: 18, s: .9 }, { rx: 12, ry: 8, s: 1 }, "out");
+  rise("c1", 26.1, .7, 80); rise("c2", 26.6, .7, 80); rise("c3", 27.1, .7, 80);
+  tw("s7row", 27.8, 31.4, { rx: 12, ry: 8, s: 1 }, { rx: 0, ry: 0, s: 1.04 }, "io");
+  rise("s7gap", 29.4, .6, 24);
+
+  // S8 33-40: evidence card scan, then three tiles
+  scene("s8", 33, 36.9); scene("s8b", 36.5, 40.2);
+  tw("ev", 33.1, 34.1, { o: 0, rx: 18, s: .94 }, { o: 1, rx: 0, s: 1 }, "out");
+  tw("scan", 34.0, 36.2, { o: .7, y: 0 }, { o: .7, y: 1 }, "io");     // y is fraction of card height (handled below)
+  tw("scan", 36.2, 36.5, { o: .7 }, { o: 0 }, "io");
+  tw("ev", 34.1, 36.9, { s: 1 }, { s: 1.04 }, "lin");
+  tw("tiles", 36.6, 36.61, { o: 1 }, { o: 1 });
+  rise("g1", 36.7, .6, 60); rise("g2", 37.0, .6, 60); rise("g3", 37.3, .6, 60);
+  tw("tiles", 36.7, 40, { s: 1 }, { s: 1.04 }, "lin");
+
+  // S9 40-45: cursor clicks Hold (simulated), then report-ready ring
+  scene("s9", 40, 43.2); scene("s9b", 42.8, 45);
+  tw("gate", 40.1, 40.9, { o: 0, rx: 16, y: 40 }, { o: 1, rx: 0, y: 0 }, "out");
+  tw("cursor", 40.6, 41.0, { o: 0 }, { o: 1 }, "io");
+  tw("cursor", 40.6, 41.9, { x: 520, y: 260 }, { x: 0, y: 0 }, "io");   // relative to target, set below
+  tw("holdbtn", 42.0, 42.12, { s: 1 }, { s: .95 }, "out"); tw("holdbtn", 42.12, 42.3, { s: .95 }, { s: 1 }, "out");
+  tw("cursor", 42.4, 42.7, { o: 1 }, { o: 0 }, "io");
+  tw("gate", 42.6, 43.1, { o: 1, s: 1 }, { o: 0, s: .96 }, "io");
+  tw("ring", 42.9, 43.3, { o: 0, s: .9 }, { o: 1, s: 1 }, "out");
+  tw("ringarc", 43.0, 43.9, { dash: 100 }, { dash: 0 }, "io");
+  tw("tick", 43.6, 44.1, { dash: 100 }, { dash: 0 }, "out");
+  rise("s9a", 43.8, .5, 20); rise("s9c", 44.1, .4, 10);
+
+  // S10 45-49
+  scene("s10", 45.1, 49);
+  rise("b1", 45.3, .5, 30); rise("b2", 46.3, .5, 30); rise("b3", 47.3, .5, 30);
+
+  // S11 49-53
+  scene("s11", 49, 53.4);
+  tw("o1", 49.1, 49.9, { o: 0, s: .9, blur: 10 }, { o: 1, s: 1, blur: 0 }, "out");
+  rise("o2", 49.9, .6, 24); rise("o3", 50.4, .6, 16); tw("o4", 50.8, 51.4, { o: 0 }, { o: 1 }, "io");
+
+  // ---- renderer ----
+  var DEF = { o: 1, x: 0, y: 0, s: 1, rx: 0, ry: 0, blur: 0 };
+  var U = Math.min(1.05 * innerWidth, 1.45 * innerHeight) / 100 / 10.8;
+  var order = T.slice().sort(function (a, b) { return a[1] - b[1]; });
+  var keys = Object.keys(el);
+  function cursorTarget() {
+    var b = el.holdbtn.getBoundingClientRect(), s = el.s9.getBoundingClientRect();
+    return { x: b.left - s.left + b.width * .55, y: b.top - s.top + b.height * .55 };
+  }
+  function seek(t) {
+    var st = {};
+    keys.forEach(function (k) { st[k] = {}; });
+    // initial values = "from" of each prop's earliest tween
+    order.forEach(function (tw) { var s = st[tw[0]]; Object.keys(tw[3]).forEach(function (p) { if (!(p in s)) s[p] = tw[3][p]; }); });
+    order.forEach(function (tw) {
+      if (t < tw[1]) return;
+      var p = tw[2] > tw[1] ? Math.min(1, (t - tw[1]) / (tw[2] - tw[1])) : 1, e = E[tw[5]](p), s = st[tw[0]];
+      Object.keys(tw[4]).forEach(function (q) {
+        if (q === "cls") { s.cls = p >= 1 ? tw[4].cls : tw[3].cls; return; }
+        var a = tw[3][q] != null ? tw[3][q] : (s[q] != null ? s[q] : DEF[q]);
+        s[q] = a + (tw[4][q] - a) * e;
+      });
+    });
+    keys.forEach(function (k) {
+      var s = st[k], n = el[k];
+      if (k === "paper") { n.style.opacity = s.o == null ? 0 : s.o; n.style.clipPath = "circle(" + ((s.s == null ? 1 : s.s) * 75) + "% at 50% 50%)"; return; }
+      if (s.dash != null) { n.style.strokeDashoffset = s.dash; }
+      if (k === "scan") { var h = el.ev.offsetHeight; n.style.top = ((s.y || 0) * (h - 4)) + "px"; n.style.opacity = s.o == null ? 0 : s.o; return; }
+      var o = s.o == null ? 1 : s.o;
+      if (k === "cursor") { var c = cursorTarget(); n.style.left = (c.x + (s.x || 0) * U) + "px"; n.style.top = (c.y + (s.y || 0) * U) + "px"; n.style.opacity = o; n.style.visibility = o <= .001 ? "hidden" : "visible"; return; }
+      n.style.opacity = o;
+      n.style.visibility = o <= .001 ? "hidden" : "visible";
+      var tr = "";
+      if (s.x || s.y) tr += "translate3d(" + ((s.x || 0) * U) + "px," + ((s.y || 0) * U) + "px,0) ";
+      if (s.rx) tr += "rotateX(" + s.rx + "deg) ";
+      if (s.ry) tr += "rotateY(" + s.ry + "deg) ";
+      if (s.s != null && s.s !== 1) tr += "scale(" + s.s + ")";
+      n.style.transform = tr;
+      n.style.filter = s.blur > .05 ? "blur(" + s.blur + "px)" : "";
+      if ("cls" in s) { n.classList.toggle("hot", s.cls === "hot"); }
+    });
+    TYPE.forEach(function (ty) {
+      var d = typed[ty[0]], p = Math.max(0, Math.min(1, (t - ty[1]) / (ty[2] - ty[1])));
+      // word-by-word, like the reference
+      var words = d.full.split(" "), n = Math.round(p * words.length);
+      d.n.textContent = words.slice(0, n).join(" ") || " ";
+    });
+    document.documentElement.setAttribute("data-t", t.toFixed(3));
+  }
+  window.seek = seek; window.MOTION_DURATION = DURATION;
+  var q = /[?&]t=([\d.]+)/.exec(location.search);
+  function start() {
+    if (q) { seek(parseFloat(q[1])); return; }
+    if (/[?&]render=1/.test(location.search)) { seek(0); return; }   // renderer drives time
+    var t0 = performance.now();
+    (function loop() { var t = (performance.now() - t0) / 1000; seek(Math.min(t, DURATION)); if (t < DURATION) requestAnimationFrame(loop); })();
+  }
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(start);
+})();
+</script>
+</body>
+</html>
