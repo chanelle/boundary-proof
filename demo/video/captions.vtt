@@ -1,0 +1,56 @@
+WEBVTT
+
+NOTE Generated from demo/js/scenario.js (walkthrough). Synthetic data; enforcement is a concept simulation.
+
+1
+00:00:00.000 --> 00:00:03.000
+You asked your AI agent for a summary.
+
+2
+00:00:03.000 --> 00:00:06.000
+It had permission to export customer records.
+
+3
+00:00:06.000 --> 00:00:09.000
+It attempted an export.
+
+4
+00:00:09.000 --> 00:00:15.000
+Did it complete? We don't know. And that uncertainty matters.
+
+5
+00:00:15.000 --> 00:00:22.000
+The request: summarize this week's complaints. The agent reads 12 synthetic tickets.
+
+6
+00:00:22.000 --> 00:00:29.000
+In between, one more call: customers.export, 2,400 rows. Nobody asked for it.
+
+7
+00:00:29.000 --> 00:00:36.000
+Intended: no. Configured: yes. Observed: unknown.
+
+8
+00:00:36.000 --> 00:00:43.000
+Attempted is not completed. The record shows no completion, so it stays unknown.
+
+9
+00:00:43.000 --> 00:00:49.000
+Severity, confidence and outcome are separate answers. Here: Critical, Medium, unknown.
+
+10
+00:00:49.000 --> 00:00:55.000
+Every claim points to a record: task, tool grant, attempted call.
+
+11
+00:00:55.000 --> 00:01:00.000
+Open questions are listed as open. Nothing is invented.
+
+12
+00:01:00.000 --> 00:01:05.000
+Concept simulation: a policy gate could hold the export for approval. Not live.
+
+13
+00:01:05.000 --> 00:01:10.000
+Mimo: what can you actually prove about your agent's authority?
+

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Permission Nobody Gave · Mimo concept demo</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Crect width=%2216%22 height=%2216%22 fill=%22%230E0F0D%22/%3E%3Crect x=%2211%22 y=%2211%22 width=%223%22 height=%223%22 fill=%22%23A9D44D%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/core.js"></script>
+<script src="js/scenario.js"></script>
+<script src="js/engine-data.js"></script>
+<script src="js/ui-common.js"></script>
+</head>
+<body>
+<div class="demo">
+  <div>
+    <header class="bar">
+      <a class="wordmark" href="index.html" data-internal>mimo<span class="dot">.</span></a>
+      <span class="label" style="margin-right:auto;margin-left:16px" id="demo-title">The Permission Nobody Gave</span>
+      <span class="tag synthetic" title="Every record in this demo is invented">Synthetic data</span>
+    </header>
+    <nav class="rail" id="rail" aria-label="Demo scenes"></nav>
+  </div>
+
+  <main class="stage" id="stage">
+
+    <!-- 0. HOOK -->
+    <section class="scene" data-scene="hook" aria-labelledby="h-hook">
+      <div class="scene-head"><span class="label">The short version · 15 seconds</span><span class="tag synthetic">Synthetic scenario</span></div>
+      <h2 id="h-hook" class="sr-only">The short version</h2>
+      <ol class="hook" id="hook-lines"></ol>
+      <p class="hook-foot label" id="hook-foot">Every line points to a record in the evidence dossier. The evidence follows.</p>
+    </section>
+
+    <!-- 1. REQUEST -->
+    <section class="scene" data-scene="request" aria-labelledby="h-request">
+      <div class="scene-head"><span class="label">Scene 1 · The ordinary request</span><span class="tag sim">Simulated agent run</span></div>
+      <h2 id="h-request">A support agent gets a simple job.</h2>
+      <p class="lede">Nothing unusual. A person asks for a summary; the agent reads tickets and writes one.</p>
+      <div class="two">
+        <div class="panel">
+          <div class="panel-h"><span class="label">Request <span id="req-id"></span></span><span class="label" id="req-at"></span></div>
+          <div class="panel-b">
+            <div class="request-bubble" id="req-text"></div>
+            <div class="request-meta label" id="req-from"></div>
+          </div>
+          <div class="panel-h" style="border-top:1px solid var(--line)"><span class="label">Agent progress</span><span class="label">support-summarizer-01</span></div>
+          <div class="panel-b">
+            <ol class="steps" id="steps">
+              <li><span class="tick">●</span><span>Read this week's tickets</span><span>tickets.read</span></li>
+              <li><span class="tick">●</span><span>Group complaints into themes</span><span>—</span></li>
+              <li><span class="tick">●</span><span>Save the summary</span><span>summaries.write</span></li>
+            </ol>
+            <div class="tickets" id="tickets" aria-label="Synthetic tickets"></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><span class="label">Output · five themes</span><span class="tag synthetic">Synthetic</span></div>
+          <div class="panel-b">
+            <ol class="summary-list" id="summary"></ol>
+            <p class="muted" style="font-size:15px;margin:16px 0 0">Useful, correct, on task. If you stopped watching here, this run looks clean.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. TOOLS -->
+    <section class="scene" data-scene="tools" aria-labelledby="h-tools">
+      <div class="scene-head"><span class="label">Scene 1b · What the agent was handed</span><span class="tag synthetic">Mock tool policy</span></div>
+      <h2 id="h-tools">Three tools were configured. The task needed two.</h2>
+      <p class="lede">The tool policy granted an export capability that the request never called for. Configured is not the same as authorized.</p>
+      <div class="tools" id="tools"></div>
+    </section>
+
+    <!-- 3. ATTEMPT -->
+    <section class="scene" data-scene="attempt" aria-labelledby="h-attempt">
+      <div class="scene-head"><span class="label">Scene 2 · The unexpected discovery</span><span class="tag sim">Synthetic trace</span></div>
+      <h2 id="h-attempt">Between reading and writing, one more call.</h2>
+      <p class="lede">The trace records the request. It does not record a response, a completion, or where the rows went.</p>
+      <div class="panel trace" id="trace" role="list"></div>
+      <div class="freeze" id="freeze">Nobody asked it to do that.</div>
+    </section>
+
+    <!-- 4. GAP -->
+    <section class="scene" data-scene="gap" aria-labelledby="h-gap">
+      <div class="scene-head"><span class="label">Scene 3 · Reveal the authority gap</span><span class="tag engine">Matrix + finding: engine output</span></div>
+      <h2 id="h-gap">Three columns that should agree. They don't.</h2>
+      <div class="ico" id="ico">
+        <div class="col"><h3>INTENDED</h3><p class="q">What the user authorized</p><p class="big" id="col-i-big"></p><div id="col-i"></div></div>
+        <div class="col"><h3>CONFIGURED</h3><p class="q">What tools and credentials permit</p><p class="big" id="col-c-big"></p><div id="col-c"></div></div>
+        <div class="col"><h3>OBSERVED</h3><p class="q">What the evidence establishes</p><p class="big" id="col-o-big"></p><div id="col-o"></div></div>
+      </div>
+      <div class="states-note label">Attempted vs completed · trace + engine <span class="tag sim">Synthetic trace</span> <span class="tag engine">Engine unknown</span> <span class="muted" style="text-transform:none;letter-spacing:.02em">The attempt comes from the evidence dossier, not from live monitoring. An attempt is not a capability: the cell stays UNKNOWN and the engine opens an unknown.</span></div>
+      <div class="states" id="states"></div>
+      <div class="gapflag" id="gapflag"></div>
+      <details class="tech" id="matrix-details">
+        <summary>Full 11-verb matrix (engine output)</summary>
+        <div class="scroll-x"><table class="matrix" id="matrix"></table></div>
+      </details>
+    </section>
+
+    <!-- 5. INTERVENE -->
+    <section class="scene" data-scene="intervene" aria-labelledby="h-intervene">
+      <div class="scene-head"><span class="label">Scene 4 · The intervention</span></div>
+      <h2 id="h-intervene">Two ways to respond.</h2>
+      <p class="lede">Audit-only is what the engine does today. Enforcement is a proposal, shown as a labeled simulation.</p>
+      <div class="modes" role="group" aria-label="Intervention mode">
+        <button type="button" data-mode="audit" aria-pressed="true">Audit-only</button>
+        <button type="button" data-mode="enforce" aria-pressed="false">Proposed enforcement</button>
+      </div>
+      <div class="mode-pane active" data-pane="audit">
+        <div class="triad" id="triad" aria-label="Three separate answers"></div>
+        <div class="panel engine-frame finding" id="finding-card"></div>
+      </div>
+      <div class="mode-pane" data-pane="enforce">
+        <div class="panel sim-frame gate">
+          <div class="scene-head"><span class="tag sim">Concept simulation · not live enforcement</span><span class="label">Replay of synthetic trace</span></div>
+          <p class="soft" style="font-size:15px;margin:12px 0 16px">A small JavaScript function replays the synthetic trace against the engine's intended column. It is not connected to any agent runtime and blocks nothing outside this page.</p>
+          <div class="trace panel" id="gate-trace" style="background:var(--bg)"></div>
+          <div style="margin-top:18px" id="gate-card">
+            <div class="decision" id="gate-decision"></div>
+            <div class="q" id="gate-q"></div>
+            <div class="gate-actions">
+              <button class="btn ghost" type="button" data-gate="deny">Deny</button>
+              <button class="btn ghost" type="button" data-gate="approve">Approve once</button>
+            </div>
+            <div class="gate-result" id="gate-result" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. PROOF -->
+    <section class="scene" data-scene="proof" id="proof" aria-labelledby="h-proof">
+      <div class="scene-head"><span class="label">Scene 5 · The proof</span><button class="btn ghost small" type="button" id="open-drawer">Open evidence drawer</button></div>
+      <h2 id="h-proof">An evidence report, not a risk score.</h2>
+      <div class="report">
+        <div class="panel">
+          <div class="panel-h"><span class="label">Evidence report · F-01</span><span class="tag engine">Engine output</span></div>
+          <div class="panel-b"><div class="kv" id="report-kv"></div></div>
+        </div>
+        <div style="display:grid;gap:20px">
+          <div class="panel">
+            <div class="panel-h"><span class="label">Evidence register</span><span class="tag engine">Engine output</span></div>
+            <div class="panel-b"><ul class="ev-list" id="ev-list"></ul></div>
+          </div>
+          <div class="panel" id="unknowns-panel">
+            <div class="panel-h"><span class="label">Unknowns</span><span class="tag gap">Open</span></div>
+            <div class="panel-b" id="unknowns"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. END -->
+    <section class="scene" data-scene="end" aria-labelledby="h-end">
+      <div class="endcard">
+        <span class="label">mimo<span class="accent">.</span> makes agent authority visible</span>
+        <h2 id="h-end">Know what your AI agents are actually allowed to do.</h2>
+        <div class="cta-row" style="margin-top:24px">
+          <a class="btn" id="end-pilot-cta" href="pilot.html#request" data-internal>Book a 30-minute Mimo discovery call <span class="arrow" aria-hidden="true">→</span></a>
+          <button class="btn ghost" type="button" id="replay">Replay demo</button>
+        </div>
+        <p class="disclosure">Interactive concept demo using synthetic data. Findings, matrix and evidence register are real BoundaryProof engine output for a synthetic scenario. Enforcement is a concept simulation, not a verified capability.</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="controls">
+    <button class="btn ghost" type="button" id="prev">← Back</button>
+    <span class="hint">← → keys · <span id="pos"></span></span>
+    <button class="btn" type="button" id="next">Next <span class="arrow" aria-hidden="true">→</span></button>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-labelledby="drawer-h">
+  <div class="panel-h"><span class="label" id="drawer-h">Evidence drawer · F-01</span><button class="btn ghost small" type="button" id="close-drawer">Close</button></div>
+  <div class="panel-b" id="drawer-body"></div>
+</aside>
+<div class="captions" id="captions" aria-live="polite"></div>
+
+<script src="js/demo.js"></script>
+</body>
+</html>

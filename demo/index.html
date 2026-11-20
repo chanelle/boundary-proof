@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mimo · Agent authority, made visible (concept demo)</title>
+<meta name="description" content="See the gap between what an AI agent was asked to do, what its tools permit, and what the evidence says happened. Concept demo using synthetic data.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Crect width=%2216%22 height=%2216%22 fill=%22%230E0F0D%22/%3E%3Crect x=%2211%22 y=%2211%22 width=%223%22 height=%223%22 fill=%22%23A9D44D%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/core.js"></script>
+<script src="js/copy.js"></script>
+<script src="js/engine-data.js"></script>
+<script src="js/ui-common.js"></script>
+</head>
+<body>
+<header class="bar">
+  <a class="wordmark" href="index.html" data-internal>mimo<span class="dot">.</span></a>
+  <span class="provisional" title="Working name pending naming clearance">Provisional name</span>
+  <nav style="margin-left:auto">
+    <a href="demo.html" data-internal class="hide-sm">Demo</a>
+    <a href="pilot.html" data-internal>Pilot</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" data-variant-root>
+    <div>
+      <div class="label eyebrow" data-copy="eyebrow"></div>
+      <h1 data-copy-html="headline"></h1>
+      <p class="subhead" data-copy="subhead"></p>
+      <div class="cta-row">
+        <a class="btn" id="primary-cta" href="demo.html" data-internal><span data-copy="cta"></span> <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn ghost" id="secondary-cta" href="demo.html#proof" data-internal data-copy="secondaryCta"></a>
+      </div>
+      <p class="disclosure" data-copy="disclosure"></p>
+    </div>
+
+    <figure class="figure" aria-label="Example authority matrix with one mismatch" style="margin:0">
+      <div class="figrow head"><span>Verb</span><span>Intended</span><span>Configured</span><span>Observed</span></div>
+      <div id="fig-rows"></div>
+      <figcaption class="figcap label">Synthetic example · rendered from BoundaryProof engine output</figcaption>
+    </figure>
+  </section>
+
+  <div class="proofstrip" aria-label="Proof strip">
+    <span class="step">Intended</span><span class="sep">→</span>
+    <span class="step">Configured</span><span class="sep">→</span>
+    <span class="step">Observed</span>
+    <span class="label" style="margin-left:auto">Blank is evidence. Unknown stays unknown.</span>
+  </div>
+
+  <section class="section">
+    <span class="label">What Mimo answers</span>
+    <h2 style="margin-top:12px;max-width:20em">What can you actually prove about this agent's authority and behavior?</h2>
+    <p class="subhead" style="max-width:40em">Most tools give you a permission list or a risk score. Mimo separates five things that usually get blurred together, and ties each one to a record.</p>
+    <div class="ladder">
+      <div><span class="label">01 · Authority</span><h3>What a person asked for</h3><p>The task as delegated, with its source and time.</p></div>
+      <div><span class="label">02 · Capability</span><h3>What the tools permit</h3><p>Every grant, mapped to one of eleven authority verbs.</p></div>
+      <div><span class="label">03 · Attempts</span><h3>What it tried</h3><p>A recorded request is an attempt, not proof of an outcome.</p></div>
+      <div><span class="label">04 · Completed</span><h3>What it finished</h3><p>Only claimed when a response or receipt shows it.</p></div>
+      <div class="unk"><span class="label">05 · Unresolved</span><h3>What nobody can say yet</h3><p>Kept as open questions with the evidence that would close them.</p></div>
+    </div>
+    <p class="disclosure">Mimo reasons over the evidence you provide: task records, tool policies, traces. It does not monitor agents live or block actions; enforcement in the demo is a labeled concept simulation.</p>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="pilot-band">
+      <div>
+        <span class="label">Founding design partner pilot</span>
+        <h2 style="margin-top:10px" data-copy="pilotHeadline"></h2>
+        <p data-copy="pilotLine"></p>
+      </div>
+      <a class="btn" id="pilot-cta" href="pilot.html#request" data-internal><span data-copy="pilotCta"></span> <span class="arrow" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <span class="label">Powered by BoundaryProof · Concept demonstration · Synthetic data only</span>
+  <span class="label">No customer evidence or runtime enforcement is claimed</span>
+</footer>
+
+<script>
+(function () {
+  var M = window.Mimo, copy = window.MimoCopy.forVariant(M.ctx.variant);
+  document.documentElement.setAttribute("data-variant", copy.variant);
+  document.querySelectorAll("[data-copy]").forEach(function (el) { el.textContent = copy[el.getAttribute("data-copy")]; });
+  document.querySelectorAll("[data-copy-html]").forEach(function (el) { el.innerHTML = copy[el.getAttribute("data-copy-html")]; });
+  // Figure rows come straight from the real engine's matrix for the demo scenario.
+  var rows = window.MIMO_ENGINE.assessment.matrix.filter(function (r) { return ["read", "write", "send_external", "delete"].indexOf(r.verb) >= 0; });
+  document.getElementById("fig-rows").innerHTML = rows.map(function (r) {
+    var hot = r.verb === "send_external";
+    function cell(v, isHot) { return "<span><i class='cell-state " + (isHot ? "hot" : v) + "'>" + v + "</i></span>"; }
+    return "<div class='figrow" + (hot ? " hot" : "") + "'><span class='verb'>" + r.verb + "</span>" +
+      cell(r.intended) + cell(r.configured, hot && r.configured !== r.intended) + cell(r.observed) + "</div>";
+  }).join("");
+  M.analytics.track("landing_view", { page: "landing", angle: copy.angle });
+  document.getElementById("primary-cta").addEventListener("click", function () {
+    try { sessionStorage.setItem("mimo.entry", "primary_cta"); } catch (e) {}
+  });
+  document.getElementById("secondary-cta").addEventListener("click", function () {
+    try { sessionStorage.setItem("mimo.entry", "secondary_cta"); } catch (e) {}
+  });
+  document.getElementById("pilot-cta").addEventListener("click", function () {
+    M.analytics.track("pilot_cta_click", { from: "landing" });
+  });
+})();
+</script>
+</body>
+</html>

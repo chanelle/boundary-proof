@@ -229,3 +229,48 @@ class TestAttackPaths(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestAttemptedActions(unittest.TestCase):
+    """An attempt with no evidenced completion raises an Unknown; it is never
+    a cell state and never becomes YES."""
+
+    def _run(self, intent, obs):
+        matrix_mod.reset_ids()
+        store = EvidenceStore()
+        rows = matrix_mod.build_matrix(intent, [], obs)
+        m, u = matrix_mod.detect_mismatches(rows, store, observations=obs)
+        return m, u, store, {r.verb: r for r in rows}
+
+    def test_attempt_raises_unknown_even_when_intent_is_no(self):
+        intent = _intent(allowed={"send_external": False}, denied=["send_external"])
+        obs = [{"verb": "send_external", "result": "UNKNOWN", "attempted": True,
+                "method": "trace", "evidence_ref": "EV-9"}]
+        _, u, store, rows = self._run(intent, obs)
+        self.assertEqual([x.id for x in u if x.id.startswith("U-attempt")], ["U-attempt-send_external"])
+        self.assertIn("U-attempt-send_external", store.unknowns)
+        att = store.unknowns["U-attempt-send_external"]
+        self.assertIn("EV-9", att.question)
+        self.assertIn("outside delegated intent", att.consequence_if_true)
+        self.assertEqual(rows["send_external"].observed, "UNKNOWN")
+
+    def test_completed_or_failed_attempts_raise_nothing(self):
+        intent = _intent(allowed={"write": True})
+        for result in ("YES", "NO"):
+            _, u, _, _ = self._run(intent, [{"verb": "write", "result": result, "attempted": True}])
+            self.assertFalse([x for x in u if x.id.startswith("U-attempt")], result)
+
+    def test_duplicate_attempts_are_one_unknown(self):
+        obs = [{"verb": "delete", "result": "UNKNOWN", "attempted": True}] * 2
+        _, u, _, _ = self._run(_intent(), obs)
+        self.assertEqual(len([x for x in u if x.id == "U-attempt-delete"]), 1)
+
+    def test_attempted_must_be_boolean(self):
+        with self.assertRaises(ValueError):
+            self._run(_intent(), [{"verb": "read", "result": "UNKNOWN", "attempted": "yes"}])
+
+    def test_omitting_observations_keeps_old_behavior(self):
+        matrix_mod.reset_ids()
+        rows = matrix_mod.build_matrix(_intent(), [], [{"verb": "read", "result": "UNKNOWN", "attempted": True}])
+        _, u = matrix_mod.detect_mismatches(rows, EvidenceStore())
+        self.assertFalse([x for x in u if x.id.startswith("U-attempt")])

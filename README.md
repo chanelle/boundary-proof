@@ -8,7 +8,7 @@
 
 [![Python](https://img.shields.io/badge/python-3.10%2B-111410)](https://www.python.org)
 [![Dependencies](https://img.shields.io/badge/dependencies-stdlib_only-1F5638)](boundaryproof/)
-[![Tests](https://img.shields.io/badge/tests-48_passing-A9D44D)](tests/)
+[![Tests](https://img.shields.io/badge/tests-62_passing-A9D44D)](tests/)
 [![License](https://img.shields.io/badge/license-MIT-black)](LICENSE)
 
 ## Why this exists
@@ -74,6 +74,8 @@ An agent dossier is JSON:
 
 Verb states are `YES | PARTIAL | NO | UNKNOWN`. Blank = `UNKNOWN`, never an assumption.
 
+An observation may carry `"attempted": true` with `"result": "UNKNOWN"` (the agent was seen trying a verb, completion not evidenced). The engine then opens an explicit `U-attempt-<verb>` unknown, whatever the intent column says. Attempts are never a cell state and never become YES.
+
 ## Human-in-the-loop
 
 Humans intervene at exactly four gates: **G1** scope authorization, **G2** intent confirmation, **G3** consequential-test approval, **G4** risk acceptance / final adjudication. The ledger tracks total effort, human active minutes, the Human Intervention Ratio (human minutes ÷ total assessment minutes, target ≤ 0.10), intervention count, autonomous completion rate, findings needing adjudication, and verification rates. Without explicit G3 approval, every consequential test is blocked, not skipped — the gap is recorded as unverified, never as a pass.
@@ -83,6 +85,10 @@ Gate decisions can be pre-supplied via `--policy` (pre-authorization, recorded a
 ## Fixtures
 
 Eight canonical scenarios in `fixtures/` (see `docs/fixtures.md`): aligned; observed exceeds intended; configured exceeds intended but unverifiable; configured restricted but observed violates; insufficient evidence; delegated authority exceeds parent; remediation verified; remediation failed.
+
+## Buyer demo (concept)
+
+`demo/` holds an interactive browser demo, *The Permission Nobody Gave*, built on this engine's real output for a synthetic scenario (`fixtures/f09_permission_nobody_gave.json`). Enforcement appears only as a labeled concept simulation. Run it with `cd demo && python3 -m http.server 8765`; see [`demo/README.md`](demo/README.md) for what is engine output and what is simulated.
 
 ## Documents
 
@@ -116,9 +122,10 @@ See `KNOWN_LIMITATIONS.md`. The honest headline: v0.1 reasons over *described* a
 
 ```
 boundaryproof/   the engine (13 stages, stdlib-only)
-fixtures/        8 canonical scenarios
+fixtures/        8 canonical scenarios + f09 demo scenario
+demo/            buyer demo (static site, synthetic data)
 policies/        example gate pre-authorizations
-tests/           48 automated tests
+tests/           62 automated tests (55 engine + 7 demo data)
 samples/         completed assessments rendered from fixtures
 docs/            architecture, schema, evidence model, gates, severity, fixtures
 ```
