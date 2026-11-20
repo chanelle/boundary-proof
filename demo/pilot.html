@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mimo Authority Gap Review · Founding design partner pilot</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Crect width=%2216%22 height=%2216%22 fill=%22%230E0F0D%22/%3E%3Crect x=%2211%22 y=%2211%22 width=%223%22 height=%223%22 fill=%22%23A9D44D%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/core.js"></script>
+<script src="js/ui-common.js"></script>
+</head>
+<body>
+<header class="bar">
+  <a class="wordmark" href="index.html" data-internal>mimo<span class="dot">.</span></a>
+  <span class="provisional">Provisional name</span>
+  <nav style="margin-left:auto"><a href="demo.html" data-internal>Demo</a></nav>
+</header>
+
+<main class="section doc">
+  <span class="label">Founding design partner pilot · proposal</span>
+  <h1 style="margin-top:18px">Mimo Authority Gap Review</h1>
+  <p class="subhead">For teams deploying AI agents with connected tools. Find where assigned agent tasks, configured tool permissions, and available execution evidence diverge.</p>
+
+  <div class="blk"><h2>Scope</h2><ul>
+    <li>One selected agent workflow</li>
+    <li>An agreed tool and permission inventory</li>
+    <li>Up to 10 synthetic or sanitized test scenarios</li>
+    <li>Evidence-based findings and a 30-minute readout</li>
+  </ul></div>
+  <div class="blk"><h2>Deliverables</h2><ul>
+    <li>Authority gap map (intended, configured, observed)</li>
+    <li>Prioritized findings with evidence identifiers</li>
+    <li>Evidence and unknowns register</li>
+    <li>Remediation recommendations</li>
+    <li>Short executive summary</li>
+  </ul></div>
+  <div class="blk"><h2>Duration</h2><p>5 business days after access and scope approval. Proposed, not a committed SLA.</p></div>
+  <div class="blk"><h2>Commercial</h2><p>Pricing by proposal after scoping. No production access required for initial discovery.</p></div>
+  <div class="blk"><h2>Data handling</h2><p>Start with synthetic data. Any real customer artifacts require written authorization, least-privilege access, agreed retention and deletion, and security review. No compliance certification is claimed.</p></div>
+  <div class="blk"><h2>What it is not</h2><p>Not runtime enforcement, monitoring, or a scanner. The underlying engine reasons over described and recorded agent behavior; it does not probe live agents.</p></div>
+
+  <div class="blk" id="request">
+    <h2>Request a walkthrough</h2>
+    <div>
+      <p style="margin-bottom:18px">Would a 20-minute walkthrough of your agent workflow be useful?</p>
+      <form class="req" id="req-form" novalidate>
+        <label>Work email<input type="email" name="email" autocomplete="email" required></label>
+        <label>Role
+          <select name="role" required>
+            <option value="">Select</option>
+            <option value="platform">AI platform lead</option>
+            <option value="agent_eng">Agent / ML engineering</option>
+            <option value="security">AI security / CISO org</option>
+            <option value="governance">AI governance / risk</option>
+            <option value="exec">Executive / budget owner</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+        <label class="full">Tool-connected agents today?
+          <select name="agents" required>
+            <option value="">Select</option>
+            <option value="production">Yes, in production</option>
+            <option value="pilot">In pilot or internal use</option>
+            <option value="exploring">Exploring, none deployed</option>
+          </select>
+        </label>
+        <div class="full"><button class="btn" type="submit">Request walkthrough <span class="arrow" aria-hidden="true">→</span></button></div>
+        <p class="full notice" id="req-notice" aria-live="polite">Prototype notice: this form has no backend. Submitting sends nothing anywhere. Only non-identifying fields (role category, deployment stage, work-email yes/no) are written to this browser's local mock analytics log; your email is never stored.</p>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer class="foot">
+  <span class="label">Powered by BoundaryProof · Concept demonstration</span>
+  <span class="label">A paid pilot is the goal; nothing here implies one is sold</span>
+</footer>
+
+<script>
+(function () {
+  var M = window.Mimo, C = window.MimoCore;
+  document.getElementById("req-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var f = e.target;
+    var res = C.qualify({ email: f.email.value, role: f.role.value, agents: f.agents.value });
+    if (res.qualified) M.analytics.track("qualified_request", res.props);
+    var n = document.getElementById("req-notice");
+    n.textContent = res.qualified
+      ? "Recorded locally as a qualified request (mock). Nothing was sent. In the live version this would reach the founder by email."
+      : "Recorded nothing: not counted as qualified (" + res.reasons.join("; ") + "). Nothing was sent.";
+    f.email.value = "";
+  });
+})();
+</script>
+</body>
+</html>

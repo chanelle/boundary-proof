@@ -8,7 +8,7 @@
 
 [![Python](https://img.shields.io/badge/python-3.10%2B-111410)](https://www.python.org)
 [![Dependencies](https://img.shields.io/badge/dependencies-stdlib_only-1F5638)](boundaryproof/)
-[![Tests](https://img.shields.io/badge/tests-48_passing-A9D44D)](tests/)
+[![Tests](https://img.shields.io/badge/tests-54_passing-A9D44D)](tests/)
 [![License](https://img.shields.io/badge/license-MIT-black)](LICENSE)
 
 ## Why this exists
@@ -84,6 +84,10 @@ Gate decisions can be pre-supplied via `--policy` (pre-authorization, recorded a
 
 Eight canonical scenarios in `fixtures/` (see `docs/fixtures.md`): aligned; observed exceeds intended; configured exceeds intended but unverifiable; configured restricted but observed violates; insufficient evidence; delegated authority exceeds parent; remediation verified; remediation failed.
 
+## Buyer demo (concept)
+
+`demo/` holds an interactive browser demo, *The Permission Nobody Gave*, built on this engine's real output for a synthetic scenario (`fixtures/f09_permission_nobody_gave.json`). Enforcement appears only as a labeled concept simulation. Run it with `cd demo && python3 -m http.server 8765`; see [`demo/README.md`](demo/README.md) for what is engine output and what is simulated.
+
 ## Documents
 
 | Document | What it covers |
@@ -116,9 +120,10 @@ See `KNOWN_LIMITATIONS.md`. The honest headline: v0.1 reasons over *described* a
 
 ```
 boundaryproof/   the engine (13 stages, stdlib-only)
-fixtures/        8 canonical scenarios
+fixtures/        8 canonical scenarios + f09 demo scenario
+demo/            buyer demo (static site, synthetic data)
 policies/        example gate pre-authorizations
-tests/           48 automated tests
+tests/           54 automated tests (48 engine + 6 demo data)
 samples/         completed assessments rendered from fixtures
 docs/            architecture, schema, evidence model, gates, severity, fixtures
 ```
