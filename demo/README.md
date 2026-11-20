@@ -38,7 +38,7 @@ python3 demo/tools/record_walkthrough.py # records video/out/walkthrough.{webm,m
 ## Tests
 
 ```bash
-python3 -m unittest discover -s tests    # 48 original engine tests + 6 demo-data tests
+python3 -m unittest discover -s tests    # 48 original + 5 attempted-action engine tests + 7 demo-data tests
 node --test demo/tests/*.test.js         # 21 unit tests: assignment, analytics, gate, scenario/engine agreement, copy
 python3 demo/tests/test_e2e.py           # 5 browser tests (skips if Playwright/Chrome missing)
 ```
@@ -49,8 +49,8 @@ python3 demo/tests/test_e2e.py           # 5 browser tests (skips if Playwright/
 |---|---|---|
 | I/C/O matrix (11 verbs), finding F-01 and F-02, severity, confidence, remediation text, evidence register, executive summary | **Real BoundaryProof engine output** over a synthetic fixture (`demo/data/engine_output.json`, regenerated and diff-checked by tests) | `ENGINE OUTPUT` (solid lime) |
 | Support request, 12 tickets, 5-theme summary, tool-call trace (TC-7781/82/83) | Synthetic scenario (`demo/js/scenario.js`); ids and timestamps match the fixture's evidence | `SYNTHETIC`, `SIMULATED AGENT RUN` |
-| Attempted vs completed vs unknown cards | Demo layer reading the synthetic trace. The engine has no ATTEMPTED state | `DEMO LAYER` |
-| "Did the export complete?" unknown | Demo annotation derived from engine observed=UNKNOWN + EV-05. Not in the engine's unknown register | `DEMO ANNOTATION` |
+| Attempted vs completed vs unknown cards | Attempt/response read from the synthetic trace; the open question is the engine's own `U-attempt-send_external` | `SYNTHETIC TRACE` + `ENGINE UNKNOWN` |
+| "Did the export complete?" | **Engine unknown** `U-attempt-send_external`, raised because the observation carries `attempted: true` with `result: UNKNOWN` | `ENGINE · U-ATTEMPT-SEND_EXTERNAL` |
 | Policy gate (deny, request approval) | `MimoCore.policyGate`, a pure function replaying the synthetic trace against the engine's intended column. Connected to nothing | `CONCEPT SIMULATION · NOT LIVE ENFORCEMENT` (dashed frame) |
 | Analytics | Mock adapter writing to `localStorage`. No transport exists in code (a test enforces this) | `?debug=1` panel |
 | Pilot request form | No backend. Stores only role category, deployment stage, and a corporate-domain yes/no; never the email | On-page notice |

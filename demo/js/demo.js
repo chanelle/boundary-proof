@@ -18,6 +18,7 @@
   var evById = {}; E.evidence.forEach(function (e) { evById[e.id] = e; });
   var exportCall = S.trace.filter(function (t) { return t.tool === "customers.export"; })[0];
   var exportStatus = C.callStatus(exportCall);
+  var attemptUnknown = E.unknowns.filter(function (u) { return u.id === "U-attempt-send_external"; })[0];
 
   var sceneIds = S.scenes.map(function (s) { return s.id; });
   var current = -1, token = 0, started = false;
@@ -65,7 +66,7 @@
   $("#states").innerHTML = [
     { k: "Configured capability", v: row.configured === "YES" ? "Yes. Tool policy grants export." : row.configured, cls: "on" },
     { k: "Attempted action", v: exportStatus.attempted ? "Yes. " + exportCall.id + " requested 2,400 rows." : "No", cls: "on" },
-    { k: "Completed action", v: exportStatus.completed === null ? "Unknown. No response in trace." : String(exportStatus.completed), cls: "unk" },
+    { k: "Completed action", v: exportStatus.completed === null ? "Unknown. Engine opened " + (attemptUnknown ? attemptUnknown.id : "no unknown") + "." : String(exportStatus.completed), cls: "unk" },
     { k: "Engine observed cell", v: row.observed + ". Not converted to YES or NO.", cls: row.observed === "UNKNOWN" ? "unk" : "on" }
   ].map(function (s) { return "<div class='state-card " + s.cls + "'><div class='k'>" + s.k + "</div><div class='v'>" + esc(s.v) + "</div></div>"; }).join("");
 
@@ -130,18 +131,21 @@
   $("#ev-list").innerHTML = E.evidence.map(function (e) {
     return "<li><span class='id'>" + e.id + "</span><div>" + esc(e.summary) + "<div class='src'>" + esc(e.kind) + " · " + esc(e.source) + "</div></div></li>";
   }).join("");
-  var engineUnknowns = E.unknowns.map(function (u) { return "<div class='unknown-item'><span class='tag engine'>Engine</span> " + esc(u.question) + "</div>"; }).join("");
+  var engineUnknowns = E.unknowns.map(function (u) {
+    return "<div class='unknown-item'><span class='tag engine'>Engine · " + esc(u.id) + "</span>" +
+      "<div style='margin-top:8px'>" + esc(u.question) + "</div>" +
+      "<div class='soft' style='font-size:15px;margin-top:4px'>" + esc(u.consequence_if_true) + "</div>" +
+      "<div class='label' style='margin-top:6px'>Needed: " + esc(u.needed_evidence) + "</div></div>";
+  }).join("");
   $("#unknowns").innerHTML =
-    "<div class='unknown-item'><span class='tag gap'>Demo annotation</span><div style='margin-top:6px'>Did " + exportCall.id + " complete, and where did the rows go?</div>" +
-    "<div class='label' style='margin-top:6px'>Derived from engine observed=" + row.observed + " + EV-05. Needed: export-destination receipts.</div></div>" +
-    (engineUnknowns || "<div class='unknown-item soft' style='font-size:15px'>Engine unknown register: " + E.unknowns.length + " entries. (v0.1 only raises triage unknowns for verbs whose intent is not NO; see limitations.)</div>") +
+    (engineUnknowns || "<div class='unknown-item soft' style='font-size:15px'>Engine unknown register: 0 entries.</div>") +
     E.limitations.slice(0, 2).map(function (l) { return "<div class='unknown-item label' style='letter-spacing:.04em;text-transform:none'>Limitation: " + esc(l) + "</div>"; }).join("");
 
   $("#drawer-body").innerHTML =
     "<p class='label'>Task scope</p><p>" + esc(S.request.text) + " <span class='muted'>(" + S.request.id + ")</span></p>" +
     "<p class='label'>Tool grants</p><p>" + S.tools.map(function (t) { return t.name + " → " + t.verb; }).join(" · ") + "</p>" +
     "<p class='label'>Attempted action</p><p>" + exportCall.id + " " + exportCall.tool + "(" + esc(exportCall.args) + ") at " + hhmmss(exportCall.at) + " UTC · " + exportStatus.label + "</p>" +
-    "<p class='label'>Uncertainty</p><p>Completion is not evidenced. The engine keeps observed=" + row.observed + ". No execution trace beyond the synthetic request record is shown, because none exists.</p>" +
+    "<p class='label'>Uncertainty</p><p>Completion is not evidenced. The engine keeps observed=" + row.observed + " and opens " + (attemptUnknown ? attemptUnknown.id : "an unknown") + ". No execution trace beyond the synthetic request record is shown, because none exists.</p>" +
     "<p class='label'>Finding " + finding.id + " (raw engine JSON)</p><pre>" + esc(JSON.stringify(finding, null, 2)) + "</pre>" +
     "<p class='label'>Evidence (raw engine JSON)</p><pre>" + esc(JSON.stringify(E.evidence, null, 2)) + "</pre>" +
     "<p><a class='btn ghost small' href='data/engine_output.json' download>Download full engine output</a></p>";

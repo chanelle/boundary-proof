@@ -158,7 +158,8 @@ def run(doc: Dict[str, Any],
         rows, store,
         delegation=doc.get("delegation", []),
         containment=doc.get("containment"),
-        identities=doc.get("identities", []))
+        identities=doc.get("identities", []),
+        observations=doc.get("observations", []))
     ledger.step()
 
     # ---- Findings (evidence-backed only) ----

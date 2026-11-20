@@ -122,6 +122,10 @@ class DemoE2E(unittest.TestCase):
         self.assertIn("TC-7782", txt)
         self.assertIn("Unknown", txt)
         self.assertIn("UNKNOWN", pg.inner_text("#col-o"))
+        self.assertIn("U-attempt-send_external", txt)
+        pg.goto(self.base + "/demo.html#proof")
+        self.assertIn("U-ATTEMPT-SEND_EXTERNAL", pg.inner_text("#unknowns").upper())
+        self.assertNotIn("Demo annotation", pg.inner_text("#unknowns"))
 
     def test_mobile_has_no_horizontal_overflow(self):
         pg = self.page(width=360)

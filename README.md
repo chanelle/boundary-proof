@@ -8,7 +8,7 @@
 
 [![Python](https://img.shields.io/badge/python-3.10%2B-111410)](https://www.python.org)
 [![Dependencies](https://img.shields.io/badge/dependencies-stdlib_only-1F5638)](boundaryproof/)
-[![Tests](https://img.shields.io/badge/tests-54_passing-A9D44D)](tests/)
+[![Tests](https://img.shields.io/badge/tests-60_passing-A9D44D)](tests/)
 [![License](https://img.shields.io/badge/license-MIT-black)](LICENSE)
 
 ## Why this exists
@@ -74,6 +74,8 @@ An agent dossier is JSON:
 
 Verb states are `YES | PARTIAL | NO | UNKNOWN`. Blank = `UNKNOWN`, never an assumption.
 
+An observation may carry `"attempted": true` with `"result": "UNKNOWN"` (the agent was seen trying a verb, completion not evidenced). The engine then opens an explicit `U-attempt-<verb>` unknown, whatever the intent column says. Attempts are never a cell state and never become YES.
+
 ## Human-in-the-loop
 
 Humans intervene at exactly four gates: **G1** scope authorization, **G2** intent confirmation, **G3** consequential-test approval, **G4** risk acceptance / final adjudication. The ledger tracks total effort, human active minutes, the Human Intervention Ratio (human minutes ÷ total assessment minutes, target ≤ 0.10), intervention count, autonomous completion rate, findings needing adjudication, and verification rates. Without explicit G3 approval, every consequential test is blocked, not skipped — the gap is recorded as unverified, never as a pass.
@@ -123,7 +125,7 @@ boundaryproof/   the engine (13 stages, stdlib-only)
 fixtures/        8 canonical scenarios + f09 demo scenario
 demo/            buyer demo (static site, synthetic data)
 policies/        example gate pre-authorizations
-tests/           54 automated tests (48 engine + 6 demo data)
+tests/           60 automated tests (53 engine + 7 demo data)
 samples/         completed assessments rendered from fixtures
 docs/            architecture, schema, evidence model, gates, severity, fixtures
 ```

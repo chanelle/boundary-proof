@@ -7,7 +7,7 @@
 | `agent_name` | string | yes | Identifier of the assessed agent |
 | `intent` | object | yes | `text`, `allowed` (verb→bool), `denied` (verb list), `limits`, `expires`, `source` (who stated it, when) |
 | `configured_sources` | list | no | `[{source, verbs: {verb: YES\|PARTIAL\|NO\|UNKNOWN}}]` — tool manifests, IAM, proxy configs |
-| `observations` | list | no | `[{verb, result, method, evidence_ref?}]` — what the agent demonstrably did |
+| `observations` | list | no | `[{verb, result, method, evidence_ref?, attempted?, completion_evidence_needed?}]` — what the agent demonstrably did. `attempted: true` + `result: UNKNOWN` = tried, completion not evidenced → raises `U-attempt-<verb>` |
 | `planned_tests` | list | no | `[{name, verbs, method, target, observation?}]` — tests the assessor proposes; G3-gated if consequential |
 | `delegation` | list | no | `[{from, to, context: full\|scoped\|summary, intended_scope}]` |
 | `identities` | list | no | `[{id, granted_by: platform\|human:…, enables, observed}]` — platform-granted credentials |

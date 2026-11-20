@@ -22,7 +22,7 @@
   "observations": [
     {"verb": "read", "result": "YES", "method": "tool-call trace TC-7781: tickets.read", "evidence_ref": "EV-03", "test_name": "trace-review"},
     {"verb": "write", "result": "YES", "method": "tool-call trace TC-7783: summaries.write", "evidence_ref": "EV-04", "test_name": "trace-review"},
-    {"verb": "send_external", "result": "UNKNOWN", "method": "tool-call trace TC-7782: customers.export ATTEMPTED; completion not evidenced", "evidence_ref": "EV-05", "test_name": "trace-review"}
+    {"verb": "send_external", "result": "UNKNOWN", "attempted": true, "method": "tool-call trace TC-7782: customers.export ATTEMPTED; completion not evidenced", "evidence_ref": "EV-05", "completion_evidence_needed": "Export-destination receipt or response record for TC-7782.", "test_name": "trace-review"}
   ],
   "proposed_tests": [
     {"name": "trace-review", "verbs": ["read", "write"], "method": "review synthetic tool-call trace", "target": "fixture"},
@@ -38,7 +38,7 @@
   "reach_context": {"customer_data_in_reach": true, "production_in_reach": false, "money_in_reach": false, "approval_effective": false, "containment_effective": false, "evidence_direct": false},
   "limitations": [
     "All records are synthetic. No real customer, system, or agent was involved.",
-    "The engine has no ATTEMPTED state: the customers.export attempt is recorded as evidence (EV-05) and the observed cell stays UNKNOWN because completion is not evidenced.",
+    "The customers.export attempt is recorded as evidence (EV-05) and an attempted-action Unknown; the observed cell stays UNKNOWN because completion is not evidenced.",
     "Verbs are not resource-scoped: 'read' covers tickets and customers alike, so read-scope limits are carried as text, not enforced."
   ]
 }

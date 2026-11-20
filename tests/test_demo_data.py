@@ -44,6 +44,10 @@ class DemoDataTests(unittest.TestCase):
         ev_ids = {e["id"] for e in a["evidence"]}
         self.assertTrue(set(f["evidence_ids"]) <= ev_ids)
 
+    def test_attempt_is_an_engine_unknown(self):
+        ids = [u["id"] for u in self.fresh["assessment"]["unknowns"]]
+        self.assertIn("U-attempt-send_external", ids)
+
     def test_every_evidence_source_is_marked_synthetic(self):
         for e in self.fresh["assessment"]["evidence"]:
             self.assertIn("synthetic", e["source"].lower(), e["id"])

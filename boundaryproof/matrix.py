@@ -99,8 +99,15 @@ def detect_mismatches(
     delegation: List[Dict[str, Any]] | None = None,
     containment: Dict[str, Any] | None = None,
     identities: List[Dict[str, Any]] | None = None,
+    observations: List[Dict[str, Any]] | None = None,
 ) -> Tuple[List[Mismatch], List[Unknown]]:
     """Compare columns; return (mismatches, new unknowns).
+
+    observations (optional): the raw observation records. Any record with
+    ``attempted: true`` and ``result: UNKNOWN`` means the agent was seen
+    *trying* the verb but completion is not evidenced. That always raises an
+    explicit Unknown, whatever the intent column says. An attempt is never a
+    cell state: it does not change the matrix and never becomes YES.
 
     Every mismatch carries the triple so the finding chain
     (intent -> config -> observation -> mismatch) is reconstructable.
@@ -211,6 +218,40 @@ def detect_mismatches(
                 detail=(f"Identity '{ident.get('id')}' arrived with the platform; no human "
                         f"delegation event granted it. Enables: {ident.get('enables')}. "
                         "Platform-provided authority bypasses the intent column entirely.")))
+
+    # 9. Attempted, completion not evidenced. Recorded as an Unknown, never
+    #    as a fifth cell state and never promoted to YES.
+    rows_by_verb = {r.verb: r for r in matrix}
+    seen_attempts = set()
+    for obs in observations or []:
+        attempted = obs.get("attempted", False)
+        if not isinstance(attempted, bool):
+            raise ValueError(f"observation 'attempted' must be true/false, got {attempted!r}")
+        if not attempted or obs.get("result", verbs.UNKNOWN) != verbs.UNKNOWN:
+            continue
+        v = obs.get("verb")
+        verbs.validate_verb(v)
+        if v in seen_attempts:
+            continue
+        seen_attempts.add(v)
+        row = rows_by_verb.get(v)
+        intended = row.intended if row else verbs.UNKNOWN
+        ref = obs.get("evidence_ref", "")
+        if intended == verbs.NO:
+            consequence = (f"An action outside delegated intent ('{v}' intended NO) may have "
+                           "completed. Its effects are unbounded until completion is established.")
+        else:
+            consequence = (f"A '{v}' action may have completed without a record of its effect "
+                           f"(intended {intended}).")
+        new_unknowns.append(make_unknown(
+            id=f"U-attempt-{v}",
+            area="attempted action",
+            question=(f"Did the attempted '{v}' action complete"
+                      f"{' (' + ref + ')' if ref else ''}?"),
+            consequence_if_true=consequence,
+            needed_evidence=(obs.get("completion_evidence_needed")
+                             or "A response, completion record, or destination receipt for the "
+                                f"attempt{' in ' + ref if ref else ''}.")))
 
     for u in new_unknowns:
         store.add_unknown(u)

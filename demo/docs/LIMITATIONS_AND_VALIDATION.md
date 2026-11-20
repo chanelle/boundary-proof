@@ -4,8 +4,8 @@
 
 1. **No runtime enforcement exists.** The policy gate is `MimoCore.policyGate`, a pure function replaying a synthetic trace inside the page. It is not connected to any agent runtime and has never blocked a real call. It is labeled `CONCEPT SIMULATION · NOT LIVE ENFORCEMENT` everywhere it appears.
 2. **No live monitoring.** BoundaryProof v0.1 reasons over a supplied dossier. The trace in the demo is written by hand, not captured from an agent.
-3. **The engine has no ATTEMPTED state.** Verb cells are `YES | PARTIAL | NO | UNKNOWN`. The demo records the export attempt as evidence (EV-05) and the engine keeps observed=UNKNOWN. The attempted/completed/unknown split shown in the UI is a demo layer over the synthetic trace, labeled as such.
-4. **The engine's unknown register is empty for this scenario.** v0.1 raises triage unknowns only for verbs whose intent is not NO, so "did the export complete?" is not an engine unknown. The demo shows it as a labeled annotation. Candidate engine change (not made here, to preserve behavior): raise an unknown when a verb has evidence of an attempt but observed is UNKNOWN.
+3. **Attempts are evidence plus an unknown, not a cell state.** Verb cells stay `YES | PARTIAL | NO | UNKNOWN`. An observation marked `attempted: true` with `result: UNKNOWN` now makes the engine open `U-attempt-<verb>` regardless of intent, and the cell stays UNKNOWN. Deliberately not a fifth state: an attempt shows intent to act, not capability, and a new state would ripple through mismatch, merge and severity logic. The attempt flag is supplied in the dossier; the engine does not detect attempts itself.
+4. **Attempt unknowns are not linked to findings.** `U-attempt-send_external` sits in the unknown register; F-01's `unknown_ids` is still empty. Linking them is a small follow-up.
 5. **Verbs are not resource-scoped.** `read` covers tickets and customer records alike. The intent limits (`read_scope: support tickets only`) are carried as text and not evaluated.
 6. **`customers.export` → `send_external` is a modeling choice.** An export to internal storage would map to `read` + `write` and produce a different finding. The fixture states the destination is external.
 7. **Severity is Critical, confidence Medium, on configuration alone.** That is the engine's real output given `customer_data_in_reach: true` and no compensating control. Expect a buyer to ask why Critical without observed exfiltration. The honest answer: severity ranks business consequence; confidence carries the evidence strength.
@@ -25,7 +25,7 @@
 
 ### Automated (run before every showing)
 
-- [ ] `python3 -m unittest discover -s tests` → 54 pass (48 engine + 6 demo data)
+- [ ] `python3 -m unittest discover -s tests` → 60 pass (48 original + 5 attempted-action + 7 demo data)
 - [ ] `node --test demo/tests/*.test.js` → 21 pass
 - [ ] `python3 demo/tests/test_e2e.py` → 5 pass (variants share DOM; stable assignment; full funnel events; simulation labels; no external requests; no console errors; no horizontal overflow at 360 px)
 - [ ] `python3 demo/build_demo_data.py && git diff --exit-code demo/data` → no drift
@@ -36,7 +36,7 @@
 - [ ] Reload: same variant
 - [ ] `?internal=1` once on your own devices, then confirm the debug panel shows `EXCLUDED: self_traffic`
 - [ ] Every scene: any engine-derived panel carries `ENGINE OUTPUT`; every simulated element carries `SIMULATED`, `SYNTHETIC`, `DEMO LAYER`, or `CONCEPT SIMULATION`
-- [ ] Gap scene: completed action reads "Unknown", never "Yes"
+- [ ] Gap scene: completed action reads "Unknown", never "Yes", and names U-attempt-send_external
 - [ ] Phone (real device): all seven scenes readable, controls reachable, drawer closes
 - [ ] Autoplay runs 70 s and ends on the close card
 - [ ] Network tab: zero requests beyond the local server
