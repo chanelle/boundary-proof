@@ -35,4 +35,4 @@ Note: the video plays the README order (evidence before enforcement). The intera
 5. Gap (40 s): point at the four cards. Say out loud: "Attempted, not completed. We don't know, and we won't pretend we do." Open the full 11-verb matrix for technical buyers.
 6. Intervention (30 s): show audit-only first (what exists), then toggle to the simulation and say "This part is a proposal."
 7. Proof (30 s): open the drawer, show the raw engine JSON, download it.
-8. End (10 s): ask the pilot question, not the CTA: "Would a 20-minute walkthrough of your agent workflow be useful?"
+8. End (10 s): ask the pilot question, not the CTA: "Would a 30-minute Mimo discovery call about your agent workflow be useful?"

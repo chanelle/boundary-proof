@@ -29,4 +29,4 @@
 
 **Positioning.** Mimo answers: what can you actually prove about your agent's authority and behavior? It separates authority, capability, attempts, completed actions and open questions, each tied to a record.
 
-**Next step.** Would a 20-minute walkthrough of your agent workflow be useful? Book at https://cal.com/chanelleh (30-minute slot; nothing is booked until you confirm there).
+**Next step.** Would a 30-minute Mimo discovery call about your agent workflow be useful? Book at https://cal.com/chanelleh (nothing is booked until you confirm there).

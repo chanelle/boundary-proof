@@ -37,12 +37,23 @@ node demo/tools/make_captions.js         # regenerates video/captions.vtt and vi
 python3 demo/tools/record_walkthrough.py # records video/out/walkthrough-16x9.mp4 (1920x1080) and walkthrough-4x5.mp4 (1080x1350, phone layout)
 ```
 
+## Production build and deploy (becomingbeta.com/mimo/)
+
+```bash
+python3 demo/tools/build_site.py     # -> demo/dist/mimo/ (adds Simple Analytics + adapter; local demo stays offline)
+bash deploy/deploy_mimo.sh           # you run it: hidden cPanel token prompt, read-only check, plan, type "yes"
+```
+
+The deploy touches only `/home/chanpdrb/becomingbeta.com/mimo/`, creates its folders, uploads 19 files, then checks every key file live (HTTP 200 + checksum) and that the existing home page still serves. It refuses to run if `/mimo` exists unless you pass `--update`. Tested end to end against a mock cPanel; not yet run against the real server.
+
+**Reading the A/B result:** visitors per variant = Simple Analytics events `mimo_landing_view_a` / `_b`; bookings per variant = Cal.com bookings whose `utm_content` is `variant_A` / `variant_B` and `utm_term` is `counted`. Primary metric = bookings ÷ visitors, per variant.
+
 ## Tests
 
 ```bash
 python3 -m unittest discover -s tests    # 48 original + 7 attempted-action engine tests + 7 demo-data tests
-node --test demo/tests/*.test.js         # 22 unit tests: assignment, analytics, gate, scenario/engine agreement, copy
-python3 demo/tests/test_e2e.py           # 5 browser tests (skips if Playwright/Chrome missing)
+node --test demo/tests/*.test.js         # 25 unit tests: assignment, analytics, gate, scenario/engine agreement, copy
+python3 demo/tests/test_e2e.py           # 8 browser tests (incl. production build with analytics stubbed) (skips if Playwright/Chrome missing)
 ```
 
 ## What is real, what is simulated
@@ -55,7 +66,8 @@ python3 demo/tests/test_e2e.py           # 5 browser tests (skips if Playwright/
 | "Did the export complete?" | **Engine unknown** `U-attempt-send_external`, raised because the observation carries `attempted: true` with `result: UNKNOWN` | `ENGINE · U-ATTEMPT-SEND_EXTERNAL` |
 | Policy gate (deny, request approval) | `MimoCore.policyGate`, a pure function replaying the synthetic trace against the engine's intended column. Connected to nothing | `CONCEPT SIMULATION · NOT LIVE ENFORCEMENT` (dashed frame) |
 | Analytics | Mock adapter writing to `localStorage`. No transport exists in code (a test enforces this) | `?debug=1` panel |
-| Pilot booking | Real handoff: a link to cal.com/chanelleh (30-minute slot) in a new tab. The page records only that the link was clicked; nothing is booked until the visitor confirms on Cal.com. `qualified_request` is logged by the operator from `?debug=1` after a real booking | On-page notice |
+| Pilot booking | Real handoff to the 30-minute Mimo discovery call at cal.com/chanelleh/30min, new tab. The link carries `utm_source/medium/campaign/content/term` + `metadata[mimo_variant]`, so each booking shows which landing variant the visitor saw (host-only, on the booking details page). Nothing is booked until the visitor confirms on Cal.com | On-page notice |
+| Live analytics (production build only) | Simple Analytics, which becomingbeta.com already uses (cookieless). `js/sa-adapter.js` sends `mimo_<event>_<variant>` once per browser per event; excluded and forced traffic sends nothing | none needed |
 | Finding outcome | "Attempted, completion UNKNOWN" comes from the evidence dossier (synthetic trace TC-7782 / EV-05), not from Mimo observing anything | "From the evidence dossier … not detected live" |
 
 ## Files

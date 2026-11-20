@@ -10,7 +10,7 @@ Mimo works from the evidence you already have (task records, tool policies, trac
 
 ## Invitation
 
-> Would a 20-minute walkthrough of one of your agent workflows be useful? We'd look at which tools it can reach, who decided that, and whether you can tell an attempted action from a completed one. No production access or customer data needed. Pick a time here: https://cal.com/chanelleh (the booking slot is 30 minutes).
+> Would a 30-minute Mimo discovery call about one of your agent workflows be useful? We'd look at which tools it can reach, who decided that, and whether you can tell an attempted action from a completed one. No production access or customer data needed. Pick a time here: https://cal.com/chanelleh
 
 ## Drafts and tracker
 

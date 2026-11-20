@@ -10,7 +10,11 @@
   });
   var analytics = C.createAnalytics({
     store: store, context: ctx,
-    sink: function (e) { if (window.console) console.info("[mimo mock analytics]", e.event, e); renderDebug(); }
+    sink: function (e) {
+      if (window.console) console.info("[mimo analytics]", e.event, e);
+      if (typeof window.MimoSink === "function") { try { window.MimoSink(e); } catch (err) { /* never break the page */ } }
+      renderDebug();
+    }
   });
 
   // Carry the visitor's variant through internal links for consistent copy,

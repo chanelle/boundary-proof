@@ -11,9 +11,11 @@
     secondaryCta: "Explore the evidence",
     proofStrip: ["Intended", "Configured", "Observed"],
     disclosure: "Interactive concept demo using synthetic data. Runtime enforcement is a proposed capability, not currently verified.",
-    pilotCta: "Discuss a pilot",
+    pilotCta: "Book a 30-minute Mimo discovery call",
+    callName: "30-minute Mimo discovery call",
+    bookingBase: "https://cal.com/chanelleh/30min",
     pilotHeadline: "Mimo Authority Gap Review",
-    pilotLine: "One agent workflow. Five business days after access and scope approval (proposed). Synthetic or sanitized data first. Pricing by proposal after scoping."
+    pilotLine: "Start with a 30-minute Mimo discovery call. The pilot: one agent workflow, five business days after access and scope approval (proposed), synthetic or sanitized data first, pricing by proposal after scoping."
   };
   var VARIANT_COPY = {
     A: {

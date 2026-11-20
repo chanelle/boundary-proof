@@ -231,6 +231,24 @@
     return { decision: "HOLD_FOR_HUMAN", reason: "intent for '" + call.verb + "' is UNKNOWN", simulated: true };
   }
 
+  // Booking handoff URL with variant attribution. Cal.com stores standard utm_*
+  // params on the booking (visible to the host on the booking details page) and
+  // metadata[...] params in the booking's metadata. Nothing personal is added.
+  function bookingUrl(base, ctx) {
+    var counted = !ctx.excluded && !ctx.forced;
+    var q = [
+      ["utm_source", "becomingbeta"],
+      ["utm_medium", "mimo_landing"],
+      ["utm_campaign", ctx.experiment],
+      ["utm_content", "variant_" + ctx.variant],
+      ["utm_term", counted ? "counted" : "excluded_" + (ctx.excludeReason || (ctx.forced ? "forced_variant" : "unknown"))],
+      ["metadata[mimo_variant]", ctx.variant],
+      ["metadata[mimo_counted]", counted ? "1" : "0"]
+    ];
+    return base + (base.indexOf("?") >= 0 ? "&" : "?") +
+      q.map(function (kv) { return encodeURIComponent(kv[0]) + "=" + encodeURIComponent(kv[1]); }).join("&");
+  }
+
   function parseParams(search) {
     var out = {};
     (search || "").replace(/^\?/, "").split("&").forEach(function (pair) {
@@ -249,6 +267,7 @@
     randomId: randomId, getOrCreateVisitor: getOrCreateVisitor,
     classifyTraffic: classifyTraffic, resolveContext: resolveContext,
     createAnalytics: createAnalytics, summarize: summarize, qualify: qualify,
-    callStatus: callStatus, policyGate: policyGate, parseParams: parseParams
+    callStatus: callStatus, policyGate: policyGate, parseParams: parseParams,
+    bookingUrl: bookingUrl
   };
 });

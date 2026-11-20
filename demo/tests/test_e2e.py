@@ -68,7 +68,7 @@ class DemoE2E(unittest.TestCase):
         self.assertIn("nobody was watching", a_h)
         self.assertIn("never intended", b_h)
         self.assertEqual(a_cls, b_cls, "variant DOM structure differs")
-        self.assertIn("PILOT", pg.inner_text("#pilot-cta").upper())
+        self.assertIn("30-MINUTE MIMO DISCOVERY CALL", pg.inner_text("#pilot-cta").upper())
         self.assertIn("synthetic data", pg.inner_text(".disclosure").lower())
         self.assertEqual(pg.external, []); self.assertEqual(pg.errors, [])
 
@@ -111,7 +111,10 @@ class DemoE2E(unittest.TestCase):
         self.assertIn("Know what your AI agents are actually allowed to do.", pg.inner_text("#h-end"))
         pg.click("#end-pilot-cta")
         pg.wait_for_url("**/pilot.html*")
-        self.assertEqual(pg.get_attribute("#book-cta", "href"), "https://cal.com/chanelleh")
+        href = pg.get_attribute("#book-cta", "href")
+        self.assertTrue(href.startswith("https://cal.com/chanelleh/30min?"), href)
+        self.assertIn("utm_content=variant_", href)
+        self.assertIn("utm_term=excluded_automation", href)  # Playwright is automation: tagged, not counted
         self.assertEqual(pg.get_attribute("#book-cta", "target"), "_blank")
         self.assertIn("Nothing is booked until you confirm", pg.inner_text("#request"))
         pg.evaluate("document.getElementById('book-cta').removeAttribute('href')")  # stay offline in tests
@@ -146,6 +149,70 @@ class DemoE2E(unittest.TestCase):
               .filter(e => !e.closest('.rail,.drawer,.scroll-x'))
               .filter(e => { const r = e.getBoundingClientRect(); return r.width && r.right > innerWidth + 1; }).length""")
             self.assertEqual(over, 0, url)
+
+
+@unittest.skipIf(sync_playwright is None, "playwright not installed")
+class ProductionBuildE2E(unittest.TestCase):
+    """Runs the built demo/dist/mimo/ with the Simple Analytics script stubbed."""
+
+    @classmethod
+    def setUpClass(cls):
+        import subprocess, sys
+        root = os.path.dirname(DEMO)
+        subprocess.run([sys.executable, os.path.join(DEMO, "tools", "build_site.py")], check=True, cwd=root,
+                       stdout=subprocess.DEVNULL)
+        handler = functools.partial(_Quiet, directory=os.path.join(DEMO, "dist"))
+        cls.httpd = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+        cls.base = f"http://127.0.0.1:{cls.httpd.server_address[1]}/mimo"
+        threading.Thread(target=cls.httpd.serve_forever, daemon=True).start()
+        cls.pw = sync_playwright().start()
+        try:
+            cls.browser = cls.pw.chromium.launch(channel=os.environ.get("MIMO_BROWSER_CHANNEL", "chrome"))
+        except Exception:
+            cls.browser = cls.pw.chromium.launch()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.browser.close(); cls.pw.stop(); cls.httpd.shutdown()
+
+    def page(self, human=True):
+        ua = ("Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 "
+              "(KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1") if human else None
+        ctx = self.browser.new_context(viewport={"width": 390, "height": 844}, user_agent=ua)
+        if human:  # look like a real visitor so the event is counted
+            ctx.add_init_script("Object.defineProperty(navigator, 'webdriver', {get: () => false})")
+        pg = ctx.new_page()
+        stub = "window.__sa=[];window.sa_event=function(n){window.__sa.push(n)};"
+        pg.route("https://scripts.simpleanalyticscdn.com/**", lambda r: r.fulfill(status=200, body=stub, content_type="text/javascript"))
+        pg.route("https://queue.simpleanalyticscdn.com/**", lambda r: r.fulfill(status=204, body=""))
+        return pg
+
+    def test_counted_visitor_sends_one_event_per_variant(self):
+        pg = self.page()
+        pg.goto(self.base + "/index.html"); pg.wait_for_timeout(400)
+        v = pg.get_attribute("html", "data-variant").lower()
+        pg.reload(); pg.wait_for_timeout(400)
+        sent = pg.evaluate("(window.__sa||[]).concat((window.sa_event&&window.sa_event.q||[]).map(a=>a[0]))")
+        # first view sent it (queued or delivered); the reload must not send it again
+        self.assertLessEqual(sent.count(f"mimo_landing_view_{v}"), 1)
+        pg.goto(self.base + "/index.html"); pg.wait_for_timeout(500)
+        self.assertEqual(pg.evaluate("(window.__sa||[]).length"), 0)  # third view: still nothing new
+        stored = pg.evaluate("JSON.parse(localStorage.getItem('mimo.sa.sent.v1')||'{}')")
+        self.assertEqual(list(stored), [f"mimo_landing_view_{v}"])
+        pg.goto(self.base + "/pilot.html")
+        href = pg.get_attribute("#book-cta", "href")
+        self.assertIn(f"utm_content=variant_{v.upper()}", href)
+        self.assertIn("utm_term=counted", href)
+
+    def test_excluded_visitor_sends_nothing(self):
+        pg = self.page(human=False)
+        pg.goto(self.base + "/index.html"); pg.wait_for_timeout(400)
+        self.assertEqual(pg.evaluate("localStorage.getItem('mimo.sa.sent.v1')"), None)
+
+    def test_forced_variant_sends_nothing(self):
+        pg = self.page()
+        pg.goto(self.base + "/index.html?variant=B"); pg.wait_for_timeout(400)
+        self.assertEqual(pg.evaluate("localStorage.getItem('mimo.sa.sent.v1')"), None)
 
 
 if __name__ == "__main__":

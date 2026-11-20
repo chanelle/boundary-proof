@@ -8,6 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Crect width=%2216%22 height=%2216%22 fill=%22%230E0F0D%22/%3E%3Crect x=%2211%22 y=%2211%22 width=%223%22 height=%223%22 fill=%22%23A9D44D%22/%3E%3C/svg%3E">
 <link rel="stylesheet" href="css/style.css">
 <script src="js/core.js"></script>
+<script src="js/copy.js"></script>
 <script src="js/ui-common.js"></script>
 </head>
 <body>
@@ -43,15 +44,15 @@
   <div class="blk" id="request">
     <h2>Book a discovery call</h2>
     <div>
-      <p style="margin-bottom:14px">Would a 20-minute walkthrough of one of your agent workflows be useful?</p>
+      <p style="margin-bottom:14px">Would a 30-minute Mimo discovery call about one of your agent workflows be useful?</p>
       <ul style="margin-bottom:20px">
-        <li><b>What you're booking:</b> a product discovery call with Chanelle Henry, founder. The booking page offers a 30-minute slot; the walkthrough takes about 20 minutes, the rest is your questions.</li>
+        <li><b>What you're booking:</b> a 30-minute Mimo discovery call with Chanelle Henry, founder, over Cal Video.</li>
         <li><b>What we cover:</b> which agents have tool access today, who decides what they may do, and whether you can tell an attempted action from a completed one.</li>
         <li><b>What we don't need:</b> production access, customer data, or credentials. Describing the workflow is enough.</li>
         <li><b>What happens after:</b> if there's a fit, a scoped proposal for the Authority Gap Review. No obligation.</li>
       </ul>
-      <a class="btn" id="book-cta" href="https://cal.com/chanelleh" target="_blank" rel="noopener">Choose a time on Cal.com <span class="arrow" aria-hidden="true">↗</span></a>
-      <p class="notice" style="margin-top:18px">Opens Chanelle's Cal.com booking page (cal.com/chanelleh) in a new tab. Nothing is booked until you confirm a time there. This page doesn't see or store your booking.</p>
+      <a class="btn" id="book-cta" href="https://cal.com/chanelleh/30min" target="_blank" rel="noopener">Book a 30-minute Mimo discovery call <span class="arrow" aria-hidden="true">↗</span><span class="sr-only"> (opens Cal.com in a new tab)</span></a>
+      <p class="notice" style="margin-top:18px">Opens Chanelle's Cal.com booking page (cal.com/chanelleh) in a new tab. Nothing is booked until you confirm a time there. The link carries only which version of this page you saw (no name, email or identifier), so we can tell which message brought you. This page doesn't see or store your booking.</p>
     </div>
   </div>
 </main>
@@ -63,10 +64,13 @@
 
 <script>
 (function () {
-  var M = window.Mimo;
-  // Records only that the handoff link was clicked. A booking happens on
-  // Cal.com; qualified_request is logged by the operator once one arrives.
-  document.getElementById("book-cta").addEventListener("click", function () {
+  var M = window.Mimo, C = window.MimoCore, copy = window.MimoCopy.SHARED;
+  var cta = document.getElementById("book-cta");
+  // Attribution: the visitor's variant rides on the booking link (utm_* and
+  // metadata). Records only that the link was clicked; the booking itself
+  // happens on Cal.com. qualified_request is logged by the operator.
+  cta.href = C.bookingUrl(copy.bookingBase, M.ctx);
+  cta.addEventListener("click", function () {
     M.analytics.track("pilot_cta_click", { from: "pilot_page", handoff: "calcom" });
   });
 })();

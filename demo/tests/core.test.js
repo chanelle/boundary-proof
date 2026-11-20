@@ -201,3 +201,39 @@ test("variants differ only in headline, subhead, primary CTA and angle", () => {
   assert.match(a.disclosure, /synthetic data/);
   assert.match(a.disclosure, /not currently verified/);
 });
+
+// ---------- booking attribution ----------
+test("booking URL carries variant + counted flag, nothing personal", () => {
+  const ctx = C.resolveContext({ store: memStore(), params: {} });
+  const url = new URL(C.bookingUrl(Copy.SHARED.bookingBase, ctx));
+  assert.equal(url.origin + url.pathname, "https://cal.com/chanelleh/30min");
+  assert.equal(url.searchParams.get("utm_content"), "variant_" + ctx.variant);
+  assert.equal(url.searchParams.get("utm_campaign"), C.EXPERIMENT_ID);
+  assert.equal(url.searchParams.get("utm_term"), "counted");
+  assert.equal(url.searchParams.get("metadata[mimo_variant]"), ctx.variant);
+  assert.ok(!url.search.includes(ctx.visitorId), "visitor id must not leave the browser");
+  const forced = C.resolveContext({ store: memStore(), params: { variant: "B" } });
+  const f = new URL(C.bookingUrl(Copy.SHARED.bookingBase, forced));
+  assert.match(f.searchParams.get("utm_term"), /^excluded_/);
+  assert.equal(f.searchParams.get("metadata[mimo_counted]"), "0");
+});
+
+test("copy names the 30-minute Mimo discovery call", () => {
+  assert.equal(Copy.SHARED.callName, "30-minute Mimo discovery call");
+  assert.match(Copy.SHARED.pilotCta, /30-minute Mimo discovery call/);
+});
+
+// ---------- Simple Analytics adapter ----------
+const SA = require("../js/sa-adapter.js");
+test("SA sink: once per browser per event, variant in name, excluded/forced never sent", () => {
+  const sent = [];
+  const sink = SA.createSink({ store: memStore(), send: n => sent.push(n) });
+  const base = { variant: "A", excluded: false, forced: false, visitor: "v_x", props: { email: "never" } };
+  assert.equal(sink({ ...base, event: "landing_view" }), "mimo_landing_view_a");
+  assert.equal(sink({ ...base, event: "landing_view" }), null);
+  assert.equal(sink({ ...base, event: "landing_view", excluded: true }), null);
+  assert.equal(sink({ ...base, event: "pilot_cta_click", forced: true }), null);
+  assert.equal(sink({ ...base, event: "meeting_held" }), null);  // operator-only events stay local
+  assert.deepEqual(sent, ["mimo_landing_view_a"]);
+  sent.forEach(n => assert.match(n, /^[a-z0-9_]+$/));
+});
